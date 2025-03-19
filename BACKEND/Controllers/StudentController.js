@@ -79,9 +79,27 @@ const updateStudentById = async (req, res, next) => {
 
 };
 
+// Delete Student by ID
+const deleteStudentById = async (req, res, next) => {
+    const id = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: 'Invalid Student ID' });
+    }
+
+    const student = await Student.findByIdAndDelete(id);
+
+    if (!student) {
+        return res.status(404).json({ message: 'Student not found' });
+    }
+
+    return res.status(200).json({ message: 'Student deleted successfully' });
+};
+
 
 // Export controllers
 exports.getAllStudents = getAllStudents;
 exports.addStudent = addStudent;
 exports.getStudentById = getStudentById;
 exports.updateStudentById = updateStudentById;
+exports.deleteStudentById = deleteStudentById;
