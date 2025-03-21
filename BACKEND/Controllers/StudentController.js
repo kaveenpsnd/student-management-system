@@ -1,105 +1,62 @@
 const mongoose = require('mongoose');
 const Student = require('../Models/StudentModel');
+const { addRecentActivity } = require('./RecentActivityController');
 
 // Get All Students
-const getAllStudents = async (req, res, next) => {
+const getAllStudents = async (req, res) => {
     try {
         const students = await Student.find();
-
-        // Handle no students found
-        if (!students) {
-            return res.status(404).json({ message: 'No students found' });
-        }
-
-        // Send students data
         return res.status(200).json({ students });
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: 'Server error' });
-    }
-};
-
-// Add Students
-const addStudent = async (req, res, next) => {
-    const { name, age, address } = req.body;
-
-    try {
-        const student = new Student({ name, age, address });
-        await student.save();
-        return res.status(201).json({ message: 'Student added successfully', student });
-
-    } catch (error) {
-        console.log(error);
-        return res.status(400).json({ message: 'Invalid data' });
-    }
-};
-
-// Get Student by ID
-const getStudentById = async (req, res, next) => {
-    const id = req.params.id;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: 'Invalid Student ID' });
-    }
-
-    try {
-        const student = await Student.findById(id);
-
-        if (!student) {
-            return res.status(404).json({ message: 'Student not found' });
-        }
-
-        return res.status(200).json({ student });
-
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server error' });
     }
 };
 
-// Update Student by ID
-
-const updateStudentById = async (req, res, next) => {
-    const id = req.params.id;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: 'Invalid Student ID' });
+// Add Student Enrollment
+const addStudent = async (req, res) => {
+    try {
+        const student = new Student(req.body);
+        await student.save();
+        await addRecentActivity(student.firstName + ' ' + student.lastName, 'was enrolled');
+        return res.status(201).json({ message: 'Student enrolled successfully', student });
+    } catch (error) {
+        console.error(error);
+        return res.status(400).json({ message: 'Invalid data' });
     }
-
-    const { name, age, address } = req.body;
-
-    const updatedStudent = await Student.findByIdAndUpdate(id, { name, age, address }, { new: true });
-
-    if (!updatedStudent) {
-        return res.status(404).json({ message: 'Student not found' });
-    }
-
-    return res.status(200).json({ message: 'Student updated successfully', student: updatedStudent });
-
 };
 
-// Delete Student by ID
-const deleteStudentById = async (req, res, next) => {
-    const id = req.params.id;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: 'Invalid Student ID' });
+// Get Student by ID
+const getStudentById = async (req, res) => {
+    try {
+        const student = await Student.findById(req.params.id);
+        return student ? res.status(200).json({ student }) : res.status(404).json({ message: 'Student not found' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
     }
-
-    const student = await Student.findByIdAndDelete(id);
-
-    if (!student) {
-        return res.status(404).json({ message: 'Student not found' });
-    }
-
-    return res.status(200).json({ message: 'Student deleted successfully' });
 };
 
+// Update Student
+const updateStudentById = async (req, res) => {
+    try {
+        const updatedStudent = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        return updatedStudent ? res.status(200).json({ message: 'Student updated', student: updatedStudent }) : res.status(404).json({ message: 'Student not found' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
 
-// Export controllers
-exports.getAllStudents = getAllStudents;
-exports.addStudent = addStudent;
-exports.getStudentById = getStudentById;
-exports.updateStudentById = updateStudentById;
-exports.deleteStudentById = deleteStudentById;
+// Delete Student
+const deleteStudentById = async (req, res) => {
+    try {
+        const student = await Student.findByIdAndDelete(req.params.id);
+        return student ? res.status(200).json({ message: 'Student deleted' }) : res.status(404).json({ message: 'Student not found' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+module.exports = { getAllStudents, addStudent, getStudentById, updateStudentById, deleteStudentById };
