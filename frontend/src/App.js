@@ -1,11 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import StudentManagement from "./Components/StudentManagement/StudentManagement";
+import StudentEnrollment from "./Components/StudentEnrollment/StudentEnrollment"; // Check this import
 
 function App() {
   return (
-    <div className="App">
-      <h1>Hi Shehan</h1>
-    </div>
+    <Router>
+      <div>
+        <Routes>
+          <Route path="/" element={<StudentManagement />} />
+          <Route path="/student-enrollment" element={<StudentEnrollment />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
