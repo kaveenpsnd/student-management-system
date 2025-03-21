@@ -1,18 +1,18 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import StudentManagement from "./Components/StudentManagement/StudentManagement";
-import StudentEnrollment from "./Components/StudentEnrollment/StudentEnrollment"; // Check this import
+import StudentEnrollment from "./Components/StudentEnrollment/StudentEnroll";
+import StudentProfile from "./Components/StudentProfile/StudentProfile";
+import StudentList from "./Components/StudentList/StudentList"; // Import the new component
 
 function App() {
   return (
-    <Router>
-      <div>
-        <Routes>
-          <Route path="/" element={<StudentManagement />} />
-          <Route path="/student-enrollment" element={<StudentEnrollment />} />
-        </Routes>
-      </div>
-    </Router>
+    <Routes>
+      <Route path="/" element={<StudentManagement />} />
+      <Route path="/student-enrollment" element={<StudentEnrollment />} />
+      <Route path="/student-profiles" element={<StudentList />} /> {/* Add this route */}
+      <Route path="/student-profiles/:studentId" element={<StudentProfile />} />
+    </Routes>
   );
 }
 

@@ -27,18 +27,16 @@ const StudentManagement = () => {
 
         {/* Management Cards */}
         <div className="card-container">
-          <div className="card">
             <Link to="/student-enrollment" className="card">
               <span className="card-icon">➕</span>
               <h3>Student Enrollment</h3>
               <p>Register new students</p>
             </Link>
-          </div>
-          <div className="card">
+          <Link to="/student-profiles" className="card"> {/* Update this link */}
             <span className="card-icon">📄</span>
             <h3>Student Profiles</h3>
             <p>View and manage profiles</p>
-          </div>
+          </Link>
           <div className="card">
             <span className="card-icon">✅</span>
             <h3>Attendance Tracking</h3>
