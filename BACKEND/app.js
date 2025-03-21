@@ -12,6 +12,14 @@ app.use(express.json());
 app.use("/student" , router);
 app.use("/activity", activityRoutes);
 
+// Test Route
+app.get("/", (req, res) => {
+    res.send("Server is running...");
+});
+
+// Use Inventory Routes
+app.use("/inventory", inventoryRoutes);
+
 // Connect to MongoDB
 mongoose.connect("mongodb+srv://admin:itp25@cluster0.srq74.mongodb.net/yourDatabaseName", {
     useNewUrlParser: true,
