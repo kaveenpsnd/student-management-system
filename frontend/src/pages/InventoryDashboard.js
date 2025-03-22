@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { inventoryApi } from '../services/api';
-import LoadingSpinner from '../common/LoadingSpinner';
-import ErrorMessage from '../common/ErrorMessage';
+import LoadingSpinner from '../Components/common/LoadingSpinner';
+import ErrorMessage from '../Components/common/ErrorMessage';
 
-function Dashboard() {
+function InventoryDashboard() {
   const [stats, setStats] = useState({
     totalItems: 0,
     totalValue: 0,
@@ -88,4 +88,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default InventoryDashboard;

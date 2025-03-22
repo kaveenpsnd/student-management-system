@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = require('./Routes/StudentRoutes');
+const inventoryRoutes = require('./Routes/InventoryRoutes');
 const activityRoutes = require('./Routes/RecentActivityRoutes');
 const cors = require('cors');
 const path = require('path');
@@ -11,7 +12,7 @@ const app = express();
 app.use(cors({
     origin: 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type']
+    allowedHeaders: ['Content-Type', 'Authorization'] 
   }));
 app.use(express.json());
 app.use("/student", router);

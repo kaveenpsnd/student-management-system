@@ -4,6 +4,7 @@
   font-family: "Arial", sans-serif;
   background-color: #f9f9f9;
   min-height: 100vh;
+  margin-left: 300px;
 }
 
 .student-list h2 {
