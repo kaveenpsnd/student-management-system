@@ -19,26 +19,24 @@ const StudentManagement = () => {
 
   return (
     <div className="student-management">
-      <Nav /> 
+      <Nav />
       <input type="text" className="search-bar" placeholder="Search students..." />
-      
+
       <div className="container">
         <h2 className="title">Student Management</h2>
 
         {/* Management Cards */}
         <div className="card-container">
-          <div className="card">
-            <Link to="/student-enrollment" className="card">
-              <span className="card-icon">➕</span>
-              <h3>Student Enrollment</h3>
-              <p>Register new students</p>
-            </Link>
-          </div>
-          <div className="card">
+          <Link to="/student-enrollment" className="card">
+            <span className="card-icon">➕</span>
+            <h3>Student Enrollment</h3>
+            <p>Register new students</p>
+          </Link>
+          <Link to="/student-profiles" className="card"> 
             <span className="card-icon">📄</span>
             <h3>Student Profiles</h3>
             <p>View and manage profiles</p>
-          </div>
+          </Link>
           <div className="card">
             <span className="card-icon">✅</span>
             <h3>Attendance Tracking</h3>
@@ -51,7 +49,7 @@ const StudentManagement = () => {
           <h3>Recent Activity</h3>
           {recentActivities.map((activity) => (
             <div key={activity._id} className="activity-item">
-              <img src="https://via.placeholder.com/40" alt="User" />
+              <img src="/default-avatar.png" alt="User" width="40" height="40" />
               <div className="activity-text">
                 <p>
                   <strong>{activity.studentName}</strong> {activity.action}
