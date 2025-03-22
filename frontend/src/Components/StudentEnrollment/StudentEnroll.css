@@ -1,4 +1,3 @@
-/* ======= Main Container ======= */
 .enrollment-container {
   max-width: 1500px;
   margin: 40px auto;
@@ -9,7 +8,6 @@
   font-family: "Poppins", sans-serif;
 }
 
-/* ======= Title & Subtitle ======= */
 h2 {
   font-size: 26px;
   font-weight: 700;
@@ -23,7 +21,6 @@ h2 {
   margin-bottom: 25px;
 }
 
-/* ======= Form Sections Layout ======= */
 .form-section {
   display: flex;
   gap: 50px;
@@ -41,7 +38,6 @@ h2 {
   align-items: center;
 }
 
-/* ======= Section Titles ======= */
 .section-title {
   font-size: 18px;
   font-weight: 600;
@@ -51,7 +47,6 @@ h2 {
   padding-bottom: 5px;
 }
 
-/* ======= Form Groups ======= */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -68,7 +63,6 @@ h2 {
   flex: 1;
 }
 
-/* ======= Labels ======= */
 label {
   font-weight: 500;
   margin-bottom: 5px;
@@ -76,8 +70,9 @@ label {
   font-size: 14px;
 }
 
-/* ======= Inputs, Select, Textarea ======= */
-input, select, textarea {
+input,
+select,
+textarea {
   width: 90%;
   padding: 12px;
   border: 2px solid #ddd;
@@ -86,19 +81,20 @@ input, select, textarea {
   transition: all 0.3s ease-in-out;
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   border-color: #007bff;
   outline: none;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
 }
 
-/* ======= Subjects Input ======= */
+
 textarea {
   height: 80px;
   resize: vertical;
 }
 
-/* ======= Student Photo Upload ======= */
 .photo-upload {
   width: 140px;
   height: 140px;
@@ -125,7 +121,6 @@ textarea {
   border-radius: 6px;
 }
 
-/* ======= File Upload Button ======= */
 .file-upload {
   display: flex;
   align-items: center;
@@ -150,7 +145,6 @@ textarea {
   background: #0056b3;
 }
 
-/* ======= Button Styling ======= */
 .button-group {
   display: flex;
   justify-content: flex-end;
@@ -186,7 +180,6 @@ button {
   background: #333;
 }
 
-/* ======= Responsive Design ======= */
 @media (max-width: 992px) {
   .form-section {
     flex-direction: column;

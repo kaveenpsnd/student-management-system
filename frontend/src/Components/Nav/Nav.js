@@ -8,7 +8,7 @@ const Nav = () => {
   return (
     <div className="nav-container">
       <h1 className="logo">EduAdmin</h1>
-      
+
       <div className="nav-links">
         <Link to="/dashboard" className={location.pathname === "/dashboard" ? "active" : ""}>📊 Dashboard</Link>
         <Link to="/" className={location.pathname === "/" ? "active" : ""}>🎓 Students</Link>

@@ -32,7 +32,7 @@ const StudentEnrollment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData();
-  
+
     // Append non-file fields
     data.append("firstName", formData.firstName);
     data.append("middleName", formData.middleName);
@@ -47,37 +47,37 @@ const StudentEnrollment = () => {
     data.append("relationship", formData.relationship);
     data.append("contactNumber", formData.contactNumber);
     data.append("emailAddress", formData.emailAddress);
-  
+
     // Append the file (if exists)
     if (formData.studentPhoto) {
-      data.append("studentPhoto", formData.studentPhoto); 
+      data.append("studentPhoto", formData.studentPhoto);
     }
     // Send the request
-  try {
-    await axios.post("http://localhost:5000/student/enroll", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    alert("Student enrolled successfully!");
-    setFormData({
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      dateOfBirth: "",
-      gender: "",
-      grade: "",
-      section: "",
-      academicYear: "",
-      subjects: "",
-      guardianName: "",
-      relationship: "",
-      contactNumber: "",
-      emailAddress: "",
-      studentPhoto: null,
-    });
-  } catch (error) {
-    console.error("Error enrolling student:", error);
-    alert("Failed to enroll student.");
-  }
+    try {
+      await axios.post("http://localhost:5000/student/enroll", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      alert("Student enrolled successfully!");
+      setFormData({
+        firstName: "",
+        middleName: "",
+        lastName: "",
+        dateOfBirth: "",
+        gender: "",
+        grade: "",
+        section: "",
+        academicYear: "",
+        subjects: "",
+        guardianName: "",
+        relationship: "",
+        contactNumber: "",
+        emailAddress: "",
+        studentPhoto: null,
+      });
+    } catch (error) {
+      console.error("Error enrolling student:", error);
+      alert("Failed to enroll student.");
+    }
   };
 
   return (

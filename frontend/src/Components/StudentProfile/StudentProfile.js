@@ -40,11 +40,11 @@ const StudentProfile = () => {
   return (
     <div className="student-profile">
       <div className="profile-header">
-      <img
-        src={student.photo || "/default-avatar.png"}
-        alt="Student"
-        className="student-photo"
-      />
+        <img
+          src={student.photo ? `http://localhost:5000${student.photo}` : "/default-avatar.png"}
+          alt="Student"
+          className="student-photo"
+        />
         <h2>{student.firstName} {student.middleName} {student.lastName}</h2>
         <p>Student ID: {student.studentId}</p>
       </div>

@@ -5,32 +5,32 @@ const upload = require('../upload');
 
 const enrollStudent = async (req, res) => {
     try {
-      console.log("Received enrollment request:", req.body);
-      console.log("Uploaded file:", req.file); // Debugging
-  
-      // Save the uploaded file path
-      const photoPath = req.file ? `/uploads/${req.file.filename}` : "/default-avatar.png";
-  
-      // Create a new student with the photo path
-      const newStudent = new Student({
-        ...req.body,
-        studentphoto: photoPath,
-      });
-  
-      await newStudent.save();
-  
-      // Add recent activity
-      await addRecentActivity(
-        `${req.body.firstName} ${req.body.lastName}`,
-        "enrolled"
-      );
-  
-      res.status(201).json({ message: "Student enrolled successfully!", studentId: newStudent.studentId });
+        console.log("Received enrollment request:", req.body);
+        console.log("Uploaded file:", req.file); 
+
+        // Save the uploaded file path
+        const photoPath = req.file ? `/uploads/${req.file.filename}` : "/default-avatar.png";
+
+        // Create a new student with the photo path
+        const newStudent = new Student({
+            ...req.body,
+            photo: photoPath,
+        });
+
+        await newStudent.save();
+
+        // Add recent activity
+        await addRecentActivity(
+            `${req.body.firstName} ${req.body.lastName}`,
+            "was enrolled"
+        );
+
+        res.status(201).json({ message: "Student enrolled successfully!", studentId: newStudent.studentId });
     } catch (error) {
-      console.error("Error enrolling student:", error); // Log the full error
-      res.status(500).json({ message: "Server error", error: error.message });
+        console.error("Error enrolling student:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
     }
-  };
+};
 
 
 const getAllStudents = async (req, res) => {

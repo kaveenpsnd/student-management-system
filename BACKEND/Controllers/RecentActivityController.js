@@ -12,8 +12,13 @@ const getRecentActivities = async (req, res) => {
 
 const addRecentActivity = async (studentName, action) => {
   try {
-    const activity = new RecentActivity({ studentName, action });
+    console.log(`Adding activity: ${studentName} ${action}`);
+    const activity = new RecentActivity({ 
+      studentName, 
+      action: `${action}`
+    });
     await activity.save();
+    console.log("Activity saved:", activity);
   } catch (error) {
     console.error("Failed to add activity:", error);
   }

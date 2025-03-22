@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getRecentActivities } = require('../Controllers/RecentActivityController'); // Ensure this is correct
+const { getRecentActivities } = require('../Controllers/RecentActivityController');
 
-router.get('/', getRecentActivities); // Ensure this is correct
-console.log(getRecentActivities); // Should log the function
+router.get('/', getRecentActivities);
+console.log(getRecentActivities); 
 
 module.exports = router;
