@@ -1,0 +1,318 @@
+.results-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+  
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .header-title {
+    display: flex;
+    align-items: center;
+  }
+  
+  .header-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.5rem;
+  }
+  
+  .header-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+  }
+  
+  .back-button {
+    font-size: 0.875rem;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .back-button:hover {
+    color: #111827;
+  }
+  
+  .student-info-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .student-info-content {
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .student-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    background-color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  
+  .student-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .student-details {
+    flex: 1;
+  }
+  
+  .student-name {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 0.25rem;
+  }
+  
+  .student-id {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .class-info {
+    text-align: right;
+  }
+  
+  .class-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .class-value {
+    font-weight: 500;
+  }
+  
+  .academic-year {
+    margin-top: 0.5rem;
+  }
+  
+  /* Exam selector and action buttons */
+  .exam-actions-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    background-color: #f9fafb;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .exam-selector {
+    display: flex;
+    align-items: center;
+  }
+  
+  .exam-selector label {
+    margin-right: 0.5rem;
+    font-weight: 500;
+    color: #4b5563;
+  }
+  
+  .exam-select {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    min-width: 250px;
+  }
+  
+  .exam-select:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  }
+  
+  .exam-buttons {
+    display: flex;
+    gap: 0.75rem;
+  }
+  
+  .add-exam-button,
+  .edit-exam-button,
+  .delete-exam-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  
+  .add-exam-button {
+    background-color: #10b981;
+    color: white;
+    border: none;
+  }
+  
+  .add-exam-button:hover {
+    background-color: #059669;
+  }
+  
+  .edit-exam-button {
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+  }
+  
+  .edit-exam-button:hover {
+    background-color: #4338ca;
+  }
+  
+  .delete-exam-button {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .delete-exam-button:hover {
+    background-color: #dc2626;
+  }
+  
+  .add-icon,
+  .edit-icon,
+  .delete-icon {
+    margin-right: 0.375rem;
+  }
+  
+  .add-exam-button-container {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+  
+  .results-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .results-title {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 1rem;
+  }
+  
+  .results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+  }
+  
+  .results-table th {
+    text-align: left;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .results-table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .results-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .subject-name {
+    font-weight: 500;
+    color: #111827;
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 9999px;
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+  
+  .results-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  
+  .total-marks {
+    font-size: 0.875rem;
+    color: #374151;
+  }
+  
+  .percentage {
+    font-size: 0.875rem;
+    color: #374151;
+  }
+  
+  .final-grade-container {
+    text-align: right;
+  }
+  
+  .final-grade-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .final-grade {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+  }
+  
+  .teacher-remarks {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .remarks-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+  }
+  
+  .remarks-content {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-style: italic;
+  }
+  
+  .results-footer {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  

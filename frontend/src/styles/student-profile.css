@@ -1,0 +1,462 @@
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+  
+  .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .header-title {
+    display: flex;
+    align-items: center;
+  }
+  
+  .header-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.5rem;
+  }
+  
+  .header-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+  }
+  
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .header-actions button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.375rem;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .header-actions button:hover {
+    background-color: #f9fafb;
+  }
+  
+  .header-actions button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  
+  .header-actions button.edit-button {
+    color: #4f46e5;
+  }
+  
+  .header-actions button.edit-button:hover {
+    color: #4338ca;
+    border-color: #4f46e5;
+  }
+  
+  .header-actions button.delete-button {
+    color: #ef4444;
+  }
+  
+  .header-actions button.delete-button:hover {
+    color: #dc2626;
+    border-color: #ef4444;
+  }
+  
+  .header-icon-button {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  
+  .user-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background-color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+    overflow: hidden;
+  }
+  
+  .user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .student-info-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .student-info-content {
+    display: flex;
+    align-items: center;
+  }
+  
+  .student-avatar {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 9999px;
+    background-color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  
+  .student-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .student-details {
+    flex: 1;
+  }
+  
+  .student-name {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 0.25rem;
+  }
+  
+  .student-id {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+  }
+  
+  .student-class {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .exam-results-button {
+    padding: 0.5rem 1rem;
+    background-color: #1f2937;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  .exam-results-button:hover {
+    background-color: #111827;
+  }
+  
+  .profile-tabs {
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+  }
+  
+  .tabs-list {
+    display: flex;
+  }
+  
+  .tab-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    border-bottom: 2px solid transparent;
+  }
+  
+  .tab-button.active {
+    color: #1f2937;
+    border-bottom-color: #1f2937;
+  }
+  
+  .profile-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .profile-content {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  .profile-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1.5rem;
+  }
+  
+  .card-title {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 1rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    background-color: #f9fafb;
+    color: #111827;
+  }
+  
+  .progress-container {
+    margin-bottom: 1rem;
+  }
+  
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+  }
+  
+  .progress-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+  }
+  
+  .progress-value {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+  }
+  
+  .progress-bar {
+    width: 100%;
+    height: 0.625rem;
+    background-color: #e5e7eb;
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    border-radius: 9999px;
+  }
+  
+  .progress-fill.present {
+    background-color: #10b981;
+  }
+  
+  .progress-fill.absent {
+    background-color: #9ca3af;
+  }
+  
+  .quick-actions {
+    margin-top: 1.5rem;
+  }
+  
+  .quick-actions-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.75rem;
+  }
+  
+  .action-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    background-color: white;
+    font-size: 0.875rem;
+    color: #111827;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+  }
+  
+  .action-button:hover {
+    background-color: #f9fafb;
+  }
+  
+  .action-icon {
+    font-size: 1rem;
+  }
+  
+  .courses-card {
+    grid-column: span 2;
+  }
+  
+  .courses-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  @media (min-width: 768px) {
+    .courses-list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  .course-item {
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+  }
+  
+  .course-name {
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 0.25rem;
+  }
+  
+  .course-professor {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+  }
+  
+  .course-schedule {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    background-color: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+  }
+  
+  .attendance-table-container {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1.5rem;
+  }
+  
+  .attendance-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+  }
+  
+  .attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .attendance-table th {
+    text-align: left;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .attendance-table td {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .attendance-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 9999px;
+  }
+  
+  .status-badge.present {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+  
+  .status-badge.absent {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  .status-badge.late {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+  
+  .attendance-notes {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  /* Add styles for the delete button at the bottom */
+  .delete-button-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .delete-student-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background-color: #fff;
+    color: #ef4444;
+    border: 1px solid #ef4444;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .delete-student-button:hover {
+    background-color: #ef4444;
+    color: white;
+  }
+  
+  .delete-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+  }
+  
+  

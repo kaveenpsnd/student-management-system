@@ -1,69 +1,61 @@
+"use client"
 
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './styles/App.css';
+import { Routes, Route } from "react-router-dom"
 
 // Layout components
-import Header from './components/layouts/Header';
-import Sidebar from './components/layouts/Sidebar';
-import Footer from './components/layouts/Footer';
+import Nav from "./Components/Nav/Nav"
 
-// Pages
-import Dashboard from './pages/Dashboard';
-import InventoryList from './pages/InventoryList';
-import AddItem from './pages/AddItems';
-import EditItem from './pages/EditItem';
-import ItemDetails from './pages/ItemDetails';
+// Student Management Pages
+import StudentManagement from "./Components/StudentManagement/StudentManagement"
+import StudentEnrollment from "./Components/StudentEnrollment/StudentEnroll"
+import StudentProfile from "./Components/StudentProfile/StudentProfile"
+import StudentList from "./Components/StudentList/StudentList"
+import ClassAttendance from "./Components/Attendance/ClassAttendance"
+import ExamResults from "./Components/ExamResults/ExamResults"
+import AddExamResult from "./Components/ExamResults/AddExamResult"
+import EditExamResult from "./Components/ExamResults/EditExamResult"
 
-// Additional Pages
-import StudentManagement from "./Components/StudentManagement/StudentManagement";
-import StudentEnrollment from "./Components/StudentEnrollment/StudentEnrollment";
+// Inventory Management Pages
+import Dashboard from "./pages/InventoryDashboard"
+import InventoryList from "./pages/InventoryList"
+import AddItem from "./pages/AddItems"
+import EditItem from "./pages/EditItem"
+import ItemDetails from "./pages/ItemDetails"
 
-function App() {
-  return (
-    <Router>
-      <div className="app">
-        <Header />
-        <div className="app-container">
-          <Sidebar />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/inventory" element={<InventoryList />} />
-              <Route path="/inventory/add" element={<AddItem />} />
-              <Route path="/inventory/edit/:id" element={<EditItem />} />
-              <Route path="/inventory/:id" element={<ItemDetails />} />
-              <Route path="/student-management" element={<StudentManagement />} />
-              <Route path="/student-enrollment" element={<StudentEnrollment />} />
-            </Routes>
-          </main>
-        </div>
-        <Footer />
-      </div>
-    </Router>
-import React from "react";
-import { Routes, Route } from "react-router-dom";
-import StudentManagement from "./Components/StudentManagement/StudentManagement";
-import StudentEnrollment from "./Components/StudentEnrollment/StudentEnroll";
-import StudentProfile from "./Components/StudentProfile/StudentProfile";
-import StudentList from "./Components/StudentList/StudentList";
-import Dashboard from "./pages/InventoryDashboard";
-import Nav from "./Components/Nav/Nav";
+// Add the import for UpdateStudent
+import UpdateStudent from "./Components/StudentEnrollment/UpdateStudent"
 
 function App() {
   return (
-    <div>
+    <div className="bg-gray-50 min-h-screen">
       <Nav />
-      <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/" element={<StudentManagement />} />
-        <Route path="/student-enrollment" element={<StudentEnrollment />} />
-        <Route path="/student-profiles" element={<StudentList />} />
-        <Route path="/student-profiles/:studentId" element={<StudentProfile />} />
-      </Routes>
+      <div className="main-content">
+        <main className="p-4">
+          <Routes>
+            {/* Student Management Routes */}
+            <Route path="/" element={<StudentManagement />} />
+            <Route path="/student-enrollment" element={<StudentEnrollment />} />
+            <Route path="/student-profiles" element={<StudentList />} />
+            <Route path="/student-profiles/:studentId" element={<StudentProfile />} />
+            {/* Add the route for updating student details inside the Routes component */}
+            <Route path="/student-profiles/edit/:studentId" element={<UpdateStudent />} />
+            <Route path="/attendance" element={<ClassAttendance />} />
+            <Route path="/exam-results/:studentId" element={<ExamResults />} />
+            <Route path="/exam-results/:studentId/add" element={<AddExamResult />} />
+            <Route path="/exam-results/:studentId/edit/:resultId" element={<EditExamResult />} />
+
+            {/* Inventory Management Routes */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/inventory" element={<InventoryList />} />
+            <Route path="/inventory/add" element={<AddItem />} />
+            <Route path="/inventory/edit/:id" element={<EditItem />} />
+            <Route path="/inventory/:id" element={<ItemDetails />} />
+          </Routes>
+        </main>
+      </div>
     </div>
-  );
+  )
 }
 
+export default App
 
-export default App;

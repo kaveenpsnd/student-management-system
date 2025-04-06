@@ -1,12 +1,15 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useNavigate } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import axios from "axios"
 import "../../styles/student-enrollment.css"
 
-const StudentEnrollment = () => {
+const UpdateStudent = () => {
+  const { studentId } = useParams()
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
@@ -15,7 +18,7 @@ const StudentEnrollment = () => {
     gender: "",
     grade: "",
     section: "",
-    academicYear: new Date().getFullYear().toString(),
+    academicYear: "",
     subjects: [],
     guardianName: "",
     relationship: "",
@@ -30,6 +33,60 @@ const StudentEnrollment = () => {
   const dropdownRef = useRef(null)
 
   const availableSubjects = ["Mathematics", "Science", "English", "History", "IT"]
+
+  // Fetch student data
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        setLoading(true)
+        const response = await axios.get(`http://localhost:5000/student/${studentId}`)
+        const student = response.data
+
+        // Format date to YYYY-MM-DD for input[type="date"]
+        const formattedDate = student.dateOfBirth ? new Date(student.dateOfBirth).toISOString().split("T")[0] : ""
+
+        // Convert subjects to array if it's a string
+        let subjectsArray = student.subjects || []
+        if (typeof subjectsArray === "string") {
+          try {
+            subjectsArray = JSON.parse(subjectsArray)
+          } catch (e) {
+            subjectsArray = subjectsArray.split(",").map((s) => s.trim())
+          }
+        }
+
+        setFormData({
+          firstName: student.firstName || "",
+          middleName: student.middleName || "",
+          lastName: student.lastName || "",
+          dateOfBirth: formattedDate,
+          gender: student.gender || "",
+          grade: student.grade || "",
+          section: student.section || "",
+          academicYear: student.academicYear || "",
+          subjects: subjectsArray,
+          guardianName: student.guardianName || "",
+          relationship: student.relationship || "",
+          contactNumber: student.contactNumber || "",
+          emailAddress: student.emailAddress || "",
+          studentPhoto: null,
+        })
+
+        // Set photo preview if available
+        if (student.photo && student.photo !== "/default-avatar.png") {
+          setPhotoPreview(`http://localhost:5000${student.photo}`)
+        }
+
+        setLoading(false)
+      } catch (err) {
+        console.error("Error fetching student data:", err)
+        setError("Failed to load student data. Please try again.")
+        setLoading(false)
+      }
+    }
+
+    fetchStudentData()
+  }, [studentId])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -83,15 +140,15 @@ const StudentEnrollment = () => {
         }
       })
 
-      await axios.post("http://localhost:5000/student/enroll", formDataToSend, {
+      await axios.put(`http://localhost:5000/student/${studentId}`, formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       })
 
-      alert("Student enrolled successfully!")
-      navigate("/student-profiles")
+      alert("Student information updated successfully!")
+      navigate(`/student-profiles/${studentId}`)
     } catch (error) {
-      console.error("Error enrolling student:", error)
-      alert("Failed to enroll student. Please try again.")
+      console.error("Error updating student:", error)
+      alert("Failed to update student information. Please try again.")
     }
   }
 
@@ -109,11 +166,29 @@ const StudentEnrollment = () => {
     }
   }, [])
 
+  if (loading) {
+    return (
+      <div className="enrollment-container">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="enrollment-container">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{error}</div>
+      </div>
+    )
+  }
+
   return (
     <div className="enrollment-container">
       <div className="enrollment-header">
-        <h1 className="enrollment-title">Student Enrollment Form</h1>
-        <p className="enrollment-subtitle">Please fill in all the required information</p>
+        <h1 className="enrollment-title">Update Student Information</h1>
+        <p className="enrollment-subtitle">Edit student details and save changes</p>
       </div>
 
       <form onSubmit={handleSubmit} className="enrollment-form">
@@ -345,7 +420,7 @@ const StudentEnrollment = () => {
                 className="photo-button"
                 onClick={() => document.getElementById("studentPhoto").click()}
               >
-                Choose File
+                Choose New Photo
               </button>
               <input
                 type="file"
@@ -356,17 +431,18 @@ const StudentEnrollment = () => {
                 className="photo-input"
               />
               <p className="photo-filename">{fileName}</p>
+              <p className="text-xs text-gray-500 mt-1">Leave empty to keep current photo</p>
             </div>
           </div>
         </div>
 
         {/* Form Actions */}
         <div className="form-actions">
-          <button type="button" onClick={() => navigate("/")} className="cancel-button">
+          <button type="button" onClick={() => navigate(`/student-profiles/${studentId}`)} className="cancel-button">
             Cancel
           </button>
           <button type="submit" className="submit-button">
-            Save Enrollment
+            Update Student
           </button>
         </div>
       </form>
@@ -374,5 +450,5 @@ const StudentEnrollment = () => {
   )
 }
 
-export default StudentEnrollment
+export default UpdateStudent
 

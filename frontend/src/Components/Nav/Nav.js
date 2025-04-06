@@ -1,25 +1,95 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import "./Nav.css";
+"use client"
+
+import { Link, useLocation } from "react-router-dom"
+import { useState, useEffect } from "react"
+import "../../styles/nav.css"
 
 const Nav = () => {
-  const location = useLocation();
+  const location = useLocation()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth)
+      if (window.innerWidth >= 1024) {
+        setIsMobileMenuOpen(false)
+      }
+    }
+
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  const isActive = (path) => {
+    return location.pathname === path || location.pathname.startsWith(path + "/")
+  }
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen)
+  }
+
+  const menuItems = [
+    { path: "/dashboard", icon: "📊", label: "Dashboard" },
+    { path: "/", icon: "👨‍🎓", label: "Students" },
+    { path: "/staff", icon: "👨‍🏫", label: "Staff" },
+    { path: "/inventory", icon: "📦", label: "Inventory" },
+    { path: "/payments", icon: "💰", label: "Payments" },
+    { path: "/calendar", icon: "📅", label: "Calendar" },
+  ]
 
   return (
-    <div className="nav-container">
-      <h1 className="logo">EduAdmin</h1>
+    <>
+      {/* Mobile Menu Toggle Button */}
+      <button className="mobile-toggle" onClick={toggleMobileMenu} aria-label="Toggle mobile menu">
+        {isMobileMenuOpen ? "✖️" : "☰"}
+      </button>
 
-      <div className="nav-links">
-        <Link to="/dashboard" className={location.pathname === "/dashboard" ? "active" : ""}>📊 Dashboard</Link>
-        <Link to="/" className={location.pathname === "/" ? "active" : ""}>🎓 Students</Link>
-        <Link to="/staff" className={location.pathname === "/staff" ? "active" : ""}>👨‍🏫 Staff</Link>
-        <Link to="/dashboard" className={location.pathname === "/dashboard" ? "active" : ""}>💼 Assets</Link>
-        <Link to="/payments" className={location.pathname === "/payments" ? "active" : ""}>💰 Payments</Link>
-        <Link to="/events" className={location.pathname === "/events" ? "active" : ""}>📅 Events</Link>
+      {/* Sidebar Navigation */}
+      <div className={`sidebar ${isMobileMenuOpen ? "mobile-open" : ""}`}>
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <span>🎓</span>
+          </div>
+          <h1 className="sidebar-title">EduAdmin</h1>
+        </div>
+
+        <div className="sidebar-content">
+          <ul className="sidebar-menu">
+            {menuItems.map((item) => (
+              <li key={item.path} className="sidebar-menu-item">
+                <Link
+                  to={item.path}
+                  className={`sidebar-menu-link ${isActive(item.path) ? "active" : ""}`}
+                  onClick={() => windowWidth < 1024 && setIsMobileMenuOpen(false)}
+                >
+                  <span className="sidebar-menu-icon">{item.icon}</span>
+                  <span className="sidebar-menu-text">{item.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="sidebar-footer">
+          <div className="sidebar-user">
+            <div className="sidebar-user-avatar">A</div>
+            <div className="sidebar-user-info">
+              <p className="sidebar-user-name">Admin User</p>
+              <p className="sidebar-user-email">admin@school.edu</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  );
-};
 
-export default Nav;
+      {/* Overlay for mobile */}
+      {isMobileMenuOpen && windowWidth < 1024 && <div className="overlay" onClick={toggleMobileMenu} />}
+
+      {/* Main Content Container */}
+      <div className="main-content">{/* The rest of the app content will be rendered here */}</div>
+    </>
+  )
+}
+
+export default Nav
 

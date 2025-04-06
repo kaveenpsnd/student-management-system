@@ -1,0 +1,219 @@
+:root {
+    --primary-color: #4f46e5;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .student-list-container {
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    margin: 2rem auto;
+    max-width: 1100px;
+  }
+  
+  .student-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .student-list-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--gray-800);
+  }
+  
+  .student-list-subtitle {
+    font-size: 1rem;
+    color: var(--gray-600);
+  }
+  
+  .enroll-button {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background 0.2s;
+  }
+  
+  .enroll-button:hover {
+    background-color: #4338ca;
+  }
+  
+  .filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+  
+  .search-container {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 0.5rem 0.8rem;
+    background-color: #fff;
+  }
+  
+  .search-icon {
+    margin-right: 0.5rem;
+  }
+  
+  .search-input {
+    border: none;
+    outline: none;
+    width: 100%;
+  }
+  
+  .filter-select {
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 0.5rem;
+    background-color: #fff;
+  }
+  
+  .student-table-container {
+    overflow-x: auto;
+    margin-top: 1rem;
+  }
+  
+  .student-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+  }
+  
+  .student-table thead {
+    background-color: var(--gray-100);
+  }
+  
+  .student-table th,
+  .student-table td {
+    padding: 0.9rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  
+  .student-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .student-avatar {
+    width: 38px;
+    height: 38px;
+    background-color: var(--gray-300);
+    color: white;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .student-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  .student-name {
+    font-weight: 500;
+    color: var(--gray-800);
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .view-button,
+  .export-button {
+    background-color: #e0e7ff;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    text-decoration: none;
+    color: var(--gray-800);
+    transition: background 0.2s;
+  }
+  
+  .view-button:hover {
+    background-color: #c7d2fe;
+  }
+  
+  .export-button:hover {
+    background-color: #cbd5e1;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+  }
+  
+  .pagination-info {
+    color: var(--gray-600);
+  }
+  
+  .pagination-buttons {
+    display: flex;
+    gap: 0.3rem;
+  }
+  
+  .pagination-button {
+    padding: 0.4rem 0.7rem;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--gray-100);
+    cursor: pointer;
+  }
+  
+  .pagination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .pagination-button:hover:not(:disabled) {
+    background-color: var(--gray-200);
+  }
+  
+  .pagination-button.active {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .empty-state {
+    padding: 2rem;
+    text-align: center;
+    color: var(--gray-600);
+    font-weight: 500;
+  }
+  
