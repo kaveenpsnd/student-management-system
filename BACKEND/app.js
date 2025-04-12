@@ -4,6 +4,7 @@ const router = require("./Routes/StudentRoutes")
 const inventoryRoutes = require("./Routes/InventoryRoutes")
 const activityRoutes = require("./Routes/RecentActivityRoutes")
 const examResultsRoutes = require("./Routes/ExamResultsRoutes")
+const attendanceRoutes = require("./Routes/AttendanceRoutes") // Add this line
 const cors = require("cors")
 const path = require("path")
 
@@ -29,6 +30,7 @@ app.use("/student", router)
 app.use("/activity", activityRoutes)
 app.use("/inventory", inventoryRoutes)
 app.use("/exam-results", examResultsRoutes)
+app.use("/attendance", attendanceRoutes) // Add this line
 app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 // Test Route
@@ -37,8 +39,9 @@ app.get("/", (req, res) => {
 })
 
 // Connect to MongoDB
-const MONGODB_URI = "mongodb+srv://admin:itp25@cluster0.srq74.mongodb.net/test"
+const MONGODB_URI = "mongodb+srv://admin:itp25@mkv.yzfyd75.mongodb.net/SSMS"
 const PORT = 5000
+
 
 mongoose
   .connect(MONGODB_URI, {
@@ -52,4 +55,3 @@ mongoose
     })
   })
   .catch((err) => console.log("MongoDB connection error:", err))
-

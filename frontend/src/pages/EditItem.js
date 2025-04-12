@@ -6,6 +6,7 @@ import EditItemForm from "../Components/InventoryManagement/EditItemForm"
 import { inventoryApi } from "../services/api"
 import LoadingSpinner from "../Components/common/LoadingSpinner"
 import ErrorMessage from "../Components/common/ErrorMessage"
+import { useToast } from "../hooks/use-toast"
 
 function EditItem() {
   const { id } = useParams()
@@ -13,6 +14,7 @@ function EditItem() {
   const [item, setItem] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const { toast } = useToast()
 
   useEffect(() => {
     const fetchItem = async () => {
@@ -32,9 +34,18 @@ function EditItem() {
   const handleSubmit = async (formData) => {
     try {
       await inventoryApi.updateItem(id, formData)
+      toast({
+        title: "Success",
+        description: "Item updated successfully",
+        variant: "success",
+      })
       navigate("/inventory")
     } catch (error) {
-      alert("Failed to update item. Please try again.")
+      toast({
+        title: "Error",
+        description: "Failed to update item. Please try again.",
+        variant: "destructive",
+      })
       console.error(error)
     }
   }
@@ -51,4 +62,3 @@ function EditItem() {
 }
 
 export default EditItem
-

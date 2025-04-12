@@ -35,7 +35,7 @@ const Nav = () => {
     { path: "/staff", icon: "👨‍🏫", label: "Staff" },
     { path: "/inventory", icon: "📦", label: "Inventory" },
     { path: "/payments", icon: "💰", label: "Payments" },
-    { path: "/calendar", icon: "📅", label: "Calendar" },
+    { path: "/calendar", icon: "📅", label: "Events" },
   ]
 
   return (
@@ -92,4 +92,3 @@ const Nav = () => {
 }
 
 export default Nav
-
