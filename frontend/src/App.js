@@ -18,11 +18,14 @@ import AddExamResult from "./Components/ExamResults/AddExamResult"
 import EditExamResult from "./Components/ExamResults/EditExamResult"
 
 // Inventory Management Pages
-import Dashboard from "./pages/InventoryDashboard"
+import InventoryDashboard from "./pages/InventoryDashboard"
 import InventoryList from "./pages/InventoryList"
 import AddItem from "./pages/AddItems"
 import EditItem from "./pages/EditItem"
 import ItemDetails from "./pages/ItemDetails"
+
+// Dashboard
+import Dashboard from "./pages/Dashboard"
 
 // Add the import for UpdateStudent
 import UpdateStudent from "./Components/StudentEnrollment/UpdateStudent"
@@ -41,12 +44,14 @@ function App() {
         <div className="main-content">
           <main className="p-4">
             <Routes>
+              {/* Dashboard Route */}
+              <Route path="/dashboard" element={<Dashboard />} />
+
               {/* Student Management Routes */}
               <Route path="/" element={<StudentManagement />} />
               <Route path="/student-enrollment" element={<StudentEnrollment />} />
               <Route path="/student-profiles" element={<StudentList />} />
               <Route path="/student-profiles/:studentId" element={<StudentProfile />} />
-              {/* Add the route for updating student details inside the Routes component */}
               <Route path="/student-profiles/edit/:studentId" element={<UpdateStudent />} />
               <Route path="/attendance" element={<ClassAttendance />} />
               <Route path="/exam-results/:studentId" element={<ExamResults />} />
@@ -54,7 +59,7 @@ function App() {
               <Route path="/exam-results/:studentId/edit/:resultId" element={<EditExamResult />} />
 
               {/* Inventory Management Routes */}
-              <Route path="/inventory" element={<Dashboard />} />
+              <Route path="/inventory" element={<InventoryDashboard />} />
               <Route path="/inventory/list" element={<InventoryList />} />
               <Route path="/inventory/add" element={<AddItem />} />
               <Route path="/inventory/edit/:id" element={<EditItem />} />
