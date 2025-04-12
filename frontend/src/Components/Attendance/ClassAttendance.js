@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import "../../styles/student-attendance.css"
+import { useToast } from "../../hooks/use-toast"
 
 const ClassAttendance = () => {
   const [selectedGrade, setSelectedGrade] = useState("")
@@ -14,6 +15,7 @@ const ClassAttendance = () => {
   const [error, setError] = useState(null)
   const [grades, setGrades] = useState([])
   const [sections, setSections] = useState([])
+  const { toast } = useToast()
 
   // Fetch all students and extract grades and sections
   useEffect(() => {
@@ -135,7 +137,11 @@ const ClassAttendance = () => {
   const handleSaveAttendance = async () => {
     try {
       if (students.length === 0) {
-        alert("No students found to save attendance for.")
+        toast({
+          title: "No Students",
+          description: "No students found to save attendance for.",
+          variant: "warning",
+        })
         return
       }
 
@@ -152,16 +158,28 @@ const ClassAttendance = () => {
       }
 
       await axios.post("http://localhost:5000/attendance", attendanceData)
-      alert("Attendance saved successfully!")
+      toast({
+        title: "Success",
+        description: "Attendance saved successfully!",
+        variant: "success",
+      })
     } catch (err) {
       console.error("Error saving attendance:", err)
-      alert("Failed to save attendance. Please try again.")
+      toast({
+        title: "Error",
+        description: "Failed to save attendance. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
   const handleDownloadAttendance = () => {
     if (students.length === 0) {
-      alert("No students to download attendance for.")
+      toast({
+        title: "No Students",
+        description: "No students to download attendance for.",
+        variant: "warning",
+      })
       return
     }
 
