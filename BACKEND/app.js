@@ -4,7 +4,9 @@ const router = require("./Routes/StudentRoutes")
 const inventoryRoutes = require("./Routes/InventoryRoutes")
 const activityRoutes = require("./Routes/RecentActivityRoutes")
 const examResultsRoutes = require("./Routes/ExamResultsRoutes")
-const attendanceRoutes = require("./Routes/AttendanceRoutes") // Add this line
+const attendanceRoutes = require("./Routes/AttendanceRoutes")
+const eventRoutes = require("./Routes/EventRoutes")
+
 const cors = require("cors")
 const path = require("path")
 
@@ -32,6 +34,7 @@ app.use("/inventory", inventoryRoutes)
 app.use("/exam-results", examResultsRoutes)
 app.use("/attendance", attendanceRoutes) // Add this line
 app.use("/uploads", express.static(path.join(__dirname, "uploads")))
+app.use("/events", eventRoutes) 
 
 // Test Route
 app.get("/", (req, res) => {
