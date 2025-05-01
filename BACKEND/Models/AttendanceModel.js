@@ -18,7 +18,7 @@ const AttendanceRecordSchema = new Schema({
   },
 })
 
-const AttendanceSchema = new Schema({
+const StudentAttendanceSchema = new Schema({
   class: {
     type: String,
     required: true,
@@ -34,7 +34,7 @@ const AttendanceSchema = new Schema({
   },
 })
 
-// Compound index to ensure uniqueness of class and date combination
-AttendanceSchema.index({ class: 1, date: 1 }, { unique: true })
+// Ensure uniqueness of class and date
+StudentAttendanceSchema.index({ class: 1, date: 1 }, { unique: true })
 
-module.exports = mongoose.model("Attendance", AttendanceSchema)
+module.exports = mongoose.model("StudentAttendance", StudentAttendanceSchema)
