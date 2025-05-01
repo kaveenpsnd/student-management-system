@@ -1,14 +1,15 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
-const bodyParser = require("body-parser")
 const path = require("path")
+const bodyParser = require("body-parser")
+const fs = require("fs")
 
 // Import routes
 const studentRoutes = require("./Routes/StudentRoutes")
 const attendanceRoutes = require("./Routes/AttendanceRoutes")
 const examResultsRoutes = require("./Routes/ExamResultsRoutes")
-const inventoryRoutes = require("./Routes/inventoryRoutes")
+const inventoryRoutes = require("./Routes/InventoryRoutes")
 const recentActivityRoutes = require("./Routes/RecentActivityRoutes")
 const staffRoutes = require("./Routes/StaffRoutes")
 const leaveRoutes = require("./Routes/LeaveRoutes")
@@ -16,8 +17,7 @@ const staffAttendanceRoutes = require("./Routes/StaffAttendanceRoutes")
 
 const app = express()
 
-// Create uploads directory if it doesn't exist
-const fs = require("fs")
+// Create uploads directories if not exist
 const uploadDir = path.join(__dirname, "uploads")
 const staffUploadsDir = path.join(uploadDir, "staff")
 
@@ -35,19 +35,20 @@ app.use(
     origin: "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  }),
+  })
 )
 app.use(express.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
-// Routes - Keep original routes to maintain compatibility with existing frontend
+// Routes
 app.use("/student", studentRoutes)
 app.use("/activity", recentActivityRoutes)
 app.use("/inventory", inventoryRoutes)
 app.use("/exam-results", examResultsRoutes)
 app.use("/attendance", attendanceRoutes)
 
-// New API routes with /api prefix for staff management
+// Staff-related API routes
 app.use("/api/staff", staffRoutes)
 app.use("/api/leaves", leaveRoutes)
 app.use("/api/staff-attendance", staffAttendanceRoutes)
@@ -57,7 +58,7 @@ app.get("/", (req, res) => {
   res.send("Server is running...")
 })
 
-// Connect to MongoDB
+// MongoDB connection
 const MONGODB_URI = "mongodb+srv://admin:itp25@mkv.yzfyd75.mongodb.net/SSMS"
 const PORT = process.env.PORT || 5000
 

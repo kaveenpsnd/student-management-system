@@ -1,607 +1,277 @@
-const { Attendance, AttendanceSummary } = require("../Models/StaffAttendanceModel")
-const Staff = require("../Models/StaffModel")
-const { Leave } = require("../Models/LeaveModel")
+const { Attendance: StaffAttendance, AttendanceSummary } = require("../Models/StaffAttendanceModel");
+const Staff = require("../Models/StaffModel");
+const { Leave } = require("../Models/LeaveModel");
+const StudentAttendance = require("../Models/AttendanceModel");
+const Student = require("../Models/StudentModel");
+const { addRecentActivity } = require("./RecentActivityController");
 
-// Helper function to send SMS notification (mock implementation)
+// ==================== Shared Helper Functions ====================
 const sendSMS = async (phoneNumber, message) => {
-  console.log(`SMS sent to ${phoneNumber}: ${message}`)
-  // In a real implementation, you would use a service like Twilio, Nexmo, etc.
-  return true
-}
+  console.log(`SMS sent to ${phoneNumber}: ${message}`);
+  return true;
+};
 
-// Helper function to calculate working hours
 const calculateWorkingHours = (checkIn, checkOut) => {
-  if (!checkIn || !checkOut) return 0
-  
-  const checkInTime = new Date(checkIn).getTime()
-  const checkOutTime = new Date(checkOut).getTime()
-  
-  // Calculate difference in milliseconds
-  const diff = checkOutTime - checkInTime
-  
-  // Convert to minutes
-  return Math.round(diff / (1000 * 60))
-}
+  if (!checkIn || !checkOut) return 0;
+  const diff = new Date(checkOut).getTime() - new Date(checkIn).getTime();
+  return Math.round(diff / (1000 * 60));
+};
 
-// Helper function to update monthly attendance summary
-const updateAttendanceSummary = async (staffId, attendanceRecord) => {
-  const date = new Date(attendanceRecord.date)
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1 // JavaScript months are 0-based
-  
-  // Find or create attendance summary
-  let summary = await AttendanceSummary.findOne({ staffId, year, month })
-  
-  if (!summary) {
-    summary = new AttendanceSummary({
-      staffId,
-      year,
-      month,
-    })
-  }
-  
-  // Calculate working days in the month
-  const daysInMonth = new Date(year, month, 0).getDate()
-  const workingDays = [...Array(daysInMonth).keys()].map(i => new Date(year, month - 1, i + 1))
-    .filter(date => date.getDay() !== 0 && date.getDay() !== 6).length
-  
-  summary.totalWorkingDays = workingDays
-  
-  // Get all attendance records for this staff in this month
-  const attendanceRecords = await Attendance.find({
+// ==================== Staff Attendance Controllers ====================
+const updateStaffSummary = async (staffId, attendanceRecord) => {
+  const date = new Date(attendanceRecord.date);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+
+  let summary = await AttendanceSummary.findOne({ staffId, year, month }) || 
+    new AttendanceSummary({ staffId, year, month });
+
+  const daysInMonth = new Date(year, month, 0).getDate();
+  summary.totalWorkingDays = [...Array(daysInMonth).keys()]
+    .map(i => new Date(year, month - 1, i + 1))
+    .filter(d => d.getDay() !== 0 && d.getDay() !== 6).length;
+
+  const records = await StaffAttendance.find({
     staffId,
-    date: {
-      $gte: new Date(year, month - 1, 1),
-      $lte: new Date(year, month, 0),
-    },
-  })
-  
-  // Calculate attendance statistics
-  let daysPresent = 0
-  let daysAbsent = 0
-  let daysHalfDay = 0
-  let daysOnLeave = 0
-  let totalWorkingHours = 0
-  let lateCount = 0
-  let earlyDepartureCount = 0
-  
-  attendanceRecords.forEach(record => {
-    switch (record.status) {
-      case "Present":
-        daysPresent++
-        totalWorkingHours += record.workingHours
-        if (record.checkIn.status === "Late") lateCount++
-        if (record.checkOut.status === "Early") earlyDepartureCount++
-        break
-      case "Absent":
-        daysAbsent++
-        break
-      case "Half-day":
-        daysHalfDay++
-        totalWorkingHours += record.workingHours
-        break
-      case "On-leave":
-        daysOnLeave++
-        break
-    }
-  })
-  
-  // Update summary
-  summary.daysPresent = daysPresent
-  summary.daysAbsent = daysAbsent
-  summary.daysHalfDay = daysHalfDay
-  summary.daysOnLeave = daysOnLeave
-  summary.totalWorkingHours = totalWorkingHours
-  summary.averageWorkingHours = daysPresent > 0 ? Math.round(totalWorkingHours / daysPresent) : 0
-  summary.lateCount = lateCount
-  summary.earlyDepartureCount = earlyDepartureCount
-  summary.attendancePercentage = workingDays > 0
-    ? Math.round(((daysPresent + daysHalfDay * 0.5 + daysOnLeave) / workingDays) * 100)
-    : 0
-  
-  await summary.save()
-  return summary
-}
+    date: { $gte: new Date(year, month - 1, 1), $lte: new Date(year, month, 0) }
+  });
 
-// Mark attendance using RFID
-exports.markAttendance = async (req, res) => {
+  // Calculate summary statistics
+  const stats = records.reduce((acc, record) => {
+    switch(record.status) {
+      case "Present":
+        acc.daysPresent++;
+        acc.totalHours += record.workingHours;
+        if(record.checkIn.status === "Late") acc.lateCount++;
+        if(record.checkOut.status === "Early") acc.earlyDepartureCount++;
+        break;
+      case "Absent": acc.daysAbsent++; break;
+      case "Half-day": acc.daysHalfDay++; break;
+      case "On-leave": acc.daysOnLeave++; break;
+    }
+    return acc;
+  }, { daysPresent:0, daysAbsent:0, daysHalfDay:0, daysOnLeave:0, totalHours:0, lateCount:0, earlyDepartureCount:0 });
+
+  Object.assign(summary, {
+    ...stats,
+    averageWorkingHours: stats.daysPresent > 0 ? Math.round(stats.totalHours / stats.daysPresent) : 0,
+    attendancePercentage: summary.totalWorkingDays > 0 
+      ? Math.round(((stats.daysPresent + stats.daysHalfDay * 0.5 + stats.daysOnLeave) / summary.totalWorkingDays) * 100)
+      : 0
+  });
+
+  return summary.save();
+};
+
+// Staff RFID Attendance
+const markStaffAttendance = async (req, res) => {
   try {
-    const { rfidCardId } = req.body
+    const { rfidCardId } = req.body;
+    const staff = await Staff.findOne({ rfidCardId });
     
-    // Validate input
-    if (!rfidCardId) {
-      return res.status(400).json({
-        success: false,
-        message: "RFID card ID is required",
-      })
-    }
-    
-    // Find staff by RFID card ID (in a real app, you'd associate RFID with staff)
-    // For this example, we'll just find a staff by ID since we don't have RFID field
-    const staff = await Staff.findById(req.body.staffId)
-    
-    if (!staff) {
-      return res.status(404).json({
-        success: false,
-        message: "Staff member not found for this RFID card",
-      })
-    }
-    
-    // Get current date (strip time part)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    
-    // Check if staff is on leave today
-    const onLeave = await Leave.findOne({
+    if (!staff) return res.status(404).json({ success: false, message: "Staff not found" });
+
+    const today = new Date().setHours(0,0,0,0);
+    const existingLeave = await Leave.findOne({
       staffId: staff._id,
       startDate: { $lte: today },
       endDate: { $gte: today },
-      leaveStatus: "Approved",
-    })
-    
-    if (onLeave) {
-      return res.status(400).json({
-        success: false,
-        message: "Cannot mark attendance while on approved leave",
-      })
-    }
-    
-    // Find or create today's attendance record
-    let attendance = await Attendance.findOne({
-      staffId: staff._id,
-      date: today,
-    })
-    
-    const currentTime = new Date()
-    
+      status: "Approved"
+    });
+
+    if (existingLeave) return res.status(400).json({ 
+      success: false, 
+      message: "Cannot mark attendance during approved leave" 
+    });
+
+    let attendance = await StaffAttendance.findOne({ staffId: staff._id, date: today });
+    const now = new Date();
+
     if (!attendance) {
-      // Create new attendance record for check-in
-      attendance = new Attendance({
+      attendance = await new StaffAttendance({
         staffId: staff._id,
         date: today,
-        checkIn: {
-          time: currentTime,
-          status: currentTime.getHours() < 9 ? "On-time" : "Late",
-        },
-        status: "Present",
-        rfidCardId,
-      })
-      
-      await attendance.save()
+        checkIn: { time: now, status: now.getHours() < 9 ? "On-time" : "Late" },
+        status: "Present"
+      }).save();
       
       return res.status(201).json({
         success: true,
-        message: `Good morning, ${staff.fullName}! Check-in successful at ${currentTime.toLocaleTimeString()}`,
-        data: attendance,
-      })
-    } else {
-      // Update existing record for check-out
-      if (!attendance.checkOut.time) {
-        attendance.checkOut = {
-          time: currentTime,
-          status: currentTime.getHours() >= 17 ? "On-time" : "Early",
-        }
-        
-        // Calculate working hours
-        attendance.workingHours = calculateWorkingHours(
-          attendance.checkIn.time,
-          currentTime
-        )
-        
-        await attendance.save()
-        
-        // Update monthly summary
-        await updateAttendanceSummary(staff._id, attendance)
-        
-        return res.status(200).json({
-          success: true,
-          message: `Goodbye, ${staff.fullName}! Check-out successful at ${currentTime.toLocaleTimeString()}. You worked for ${Math.floor(attendance.workingHours / 60)} hours and ${attendance.workingHours % 60} minutes today.`,
-          data: attendance,
-        })
-      } else {
-        return res.status(400).json({
-          success: false,
-          message: "You have already checked out today",
-        })
-      }
+        message: `Check-in successful at ${now.toLocaleTimeString()}`,
+        data: attendance
+      });
     }
-  } catch (error) {
-    console.error("Error marking attendance:", error)
-    res.status(500).json({
-      success: false,
-      message: "Failed to mark attendance",
-      error: error.message,
-    })
-  }
-}
 
-// Manually mark attendance for staff (admin function)
-exports.manualAttendance = async (req, res) => {
-  try {
-    const { staffId, date, checkInTime, checkOutTime, status, remarks } = req.body
-    
-    // Validate input
-    if (!staffId || !date) {
-      return res.status(400).json({
-        success: false,
-        message: "Staff ID and date are required",
-      })
-    }
-    
-    // Check if staff exists
-    const staff = await Staff.findById(staffId)
-    if (!staff) {
-      return res.status(404).json({
-        success: false,
-        message: "Staff member not found",
-      })
-    }
-    
-    // Parse date
-    const attendanceDate = new Date(date)
-    attendanceDate.setHours(0, 0, 0, 0)
-    
-    // Check if record already exists
-    let attendance = await Attendance.findOne({
-      staffId,
-      date: attendanceDate,
-    })
-    
-    if (!attendance) {
-      // Create new attendance record
-      attendance = new Attendance({
-        staffId,
-        date: attendanceDate,
-        status: status || "Present",
-        remarks,
-      })
-    } else {
-      // Update existing record
-      attendance.status = status || attendance.status
-      attendance.remarks = remarks || attendance.remarks
-    }
-    
-    // Set check-in and check-out times if provided
-    if (checkInTime) {
-      const [hours, minutes] = checkInTime.split(':').map(Number)
-      const checkIn = new Date(attendanceDate)
-      checkIn.setHours(hours, minutes, 0, 0)
+    if (!attendance.checkOut.time) {
+      attendance.checkOut = { 
+        time: now, 
+        status: now.getHours() >= 17 ? "On-time" : "Early" 
+      };
+      attendance.workingHours = calculateWorkingHours(attendance.checkIn.time, now);
+      await attendance.save();
+      await updateStaffSummary(staff._id, attendance);
       
-      attendance.checkIn = {
-        time: checkIn,
-        status: hours < 9 ? "On-time" : "Late",
-      }
+      return res.status(200).json({
+        success: true,
+        message: `Check-out successful. Worked ${Math.floor(attendance.workingHours/60)}h ${attendance.workingHours%60}m`,
+        data: attendance
+      });
     }
-    
-    if (checkOutTime) {
-      const [hours, minutes] = checkOutTime.split(':').map(Number)
-      const checkOut = new Date(attendanceDate)
-      checkOut.setHours(hours, minutes, 0, 0)
-      
-      attendance.checkOut = {
-        time: checkOut,
-        status: hours >= 17 ? "On-time" : "Early",
-      }
-    }
-    
-    // Calculate working hours if both check-in and check-out are provided
-    if (attendance.checkIn.time && attendance.checkOut.time) {
-      attendance.workingHours = calculateWorkingHours(
-        attendance.checkIn.time,
-        attendance.checkOut.time
-      )
-    }
-    
-    await attendance.save()
-    
-    // Update monthly summary
-    await updateAttendanceSummary(staffId, attendance)
-    
-    res.status(200).json({
-      success: true,
-      message: "Attendance record updated successfully",
-      data: attendance,
-    })
-  } catch (error) {
-    console.error("Error updating attendance:", error)
-    res.status(500).json({
-      success: false,
-      message: "Failed to update attendance",
-      error: error.message,
-    })
-  }
-}
 
-// Get attendance for a specific staff member
-exports.getStaffAttendance = async (req, res) => {
+    return res.status(400).json({ success: false, message: "Already checked out today" });
+  } catch (error) {
+    console.error("Staff attendance error:", error);
+    res.status(500).json({ success: false, message: "Attendance processing failed", error: error.message });
+  }
+};
+
+// Staff Manual Attendance
+const manualStaffAttendance = async (req, res) => {
   try {
-    const { id } = req.params
-    const { month, year } = req.query
-    
-    // Check if staff exists
-    const staff = await Staff.findById(id)
-    if (!staff) {
-      return res.status(404).json({
-        success: false,
-        message: "Staff member not found",
-      })
+    const { staffId, date, checkIn, checkOut, status } = req.body;
+    const attendanceDate = new Date(date).setHours(0,0,0,0);
+
+    let record = await StaffAttendance.findOne({ staffId, date: attendanceDate }) ||
+      new StaffAttendance({ staffId, date: attendanceDate });
+
+    if (checkIn) {
+      const [h, m] = checkIn.split(':');
+      record.checkIn = {
+        time: new Date(attendanceDate).setHours(h, m),
+        status: h < 9 ? "On-time" : "Late"
+      };
     }
+
+    if (checkOut) {
+      const [h, m] = checkOut.split(':');
+      record.checkOut = {
+        time: new Date(attendanceDate).setHours(h, m),
+        status: h >= 17 ? "On-time" : "Early"
+      };
+      record.workingHours = calculateWorkingHours(record.checkIn.time, record.checkOut.time);
+    }
+
+    record.status = status || record.status;
+    await record.save();
+    await updateStaffSummary(staffId, record);
+
+    res.status(200).json({ success: true, data: record });
+  } catch (error) {
+    console.error("Manual staff attendance error:", error);
+    res.status(500).json({ success: false, message: "Manual attendance update failed", error: error.message });
+  }
+};
+
+// Staff Reports
+const getStaffAttendance = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { month, year } = req.query;
     
-    let query = { staffId: id }
-    
-    // Filter by month and year if provided
+    const filter = { staffId: id };
     if (month && year) {
-      const startDate = new Date(year, month - 1, 1)
-      const endDate = new Date(year, month, 0)
-      query.date = { $gte: startDate, $lte: endDate }
+      filter.date = { 
+        $gte: new Date(year, month-1, 1), 
+        $lte: new Date(year, month, 0) 
+      };
     }
-    
-    // Get attendance records
-    const attendanceRecords = await Attendance.find(query).sort({ date: 1 })
-    
-    // Get attendance summary
-    const summary = month && year
-      ? await AttendanceSummary.findOne({ staffId: id, year, month })
-      : null
-    
-    res.status(200).json({
-      success: true,
-      data: {
-        attendance: attendanceRecords,
-        summary,
-      },
-    })
-  } catch (error) {
-    console.error("Error fetching attendance:", error)
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch attendance",
-      error: error.message,
-    })
-  }
-}
 
-// Get attendance records for all staff (admin function)
-exports.getAllAttendance = async (req, res) => {
+    const [records, summary] = await Promise.all([
+      StaffAttendance.find(filter).sort({ date: 1 }),
+      month && year ? AttendanceSummary.findOne({ staffId: id, year, month }) : null
+    ]);
+
+    res.status(200).json({ success: true, data: { records, summary } });
+  } catch (error) {
+    console.error("Staff attendance fetch error:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch staff attendance", error: error.message });
+  }
+};
+
+// ==================== Student Attendance Controllers ====================
+const getClassAttendance = async (req, res) => {
   try {
-    const { date, month, year, staffId, status } = req.query
+    const { className } = req.params;
+    const { date } = req.query;
     
-    let query = {}
-    
-    // Apply filters
-    if (staffId) {
-      query.staffId = staffId
-    }
-    
-    if (status) {
-      query.status = status
-    }
-    
-    if (date) {
-      const attendanceDate = new Date(date)
-      attendanceDate.setHours(0, 0, 0, 0)
-      query.date = attendanceDate
-    } else if (month && year) {
-      const startDate = new Date(year, month - 1, 1)
-      const endDate = new Date(year, month, 0)
-      query.date = { $gte: startDate, $lte: endDate }
-    }
-    
-    // Get attendance records with staff details
-    const attendanceRecords = await Attendance.find(query)
-      .populate("staffId", "fullName staffId staffType designation photo")
-      .sort({ date: -1 })
-    
-    res.status(200).json({
-      success: true,
-      count: attendanceRecords.length,
-      data: attendanceRecords,
-    })
-  } catch (error) {
-    console.error("Error fetching attendance records:", error)
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch attendance records",
-      error: error.message,
-    })
-  }
-}
+    const attendance = await StudentAttendance.findOne({ 
+      class: className, 
+      date: new Date(date) 
+    }).populate('students.studentId', 'name rollNumber');
 
-// Generate attendance report
-exports.generateAttendanceReport = async (req, res) => {
+    if (!attendance) return res.status(404).json({ 
+      success: false, 
+      message: "No attendance found for this date" 
+    });
+
+    res.status(200).json({ success: true, data: attendance });
+  } catch (error) {
+    console.error("Class attendance error:", error);
+    res.status(500).json({ success: false, message: "Failed to get class attendance", error: error.message });
+  }
+};
+
+const saveStudentAttendance = async (req, res) => {
   try {
-    const { staffId, month, year, reportType } = req.query
-    
-    // Validate required parameters
-    if (reportType === "monthly" && (!month || !year)) {
-      return res.status(400).json({
-        success: false,
-        message: "Month and year are required for monthly report",
-      })
-    }
-    
-    if (reportType === "annual" && !year) {
-      return res.status(400).json({
-        success: false,
-        message: "Year is required for annual report",
-      })
-    }
-    
-    // Get staff data if staffId is provided
-    let staff = null
-    if (staffId) {
-      staff = await Staff.findById(staffId).select("-password")
-      if (!staff) {
-        return res.status(404).json({
-          success: false,
-          message: "Staff member not found",
-        })
-      }
-    }
-    
-    // Generate report based on type
-    if (reportType === "monthly") {
-      if (staffId) {
-        // Individual monthly report
-        const startDate = new Date(year, month - 1, 1)
-        const endDate = new Date(year, month, 0)
-        
-        const attendanceRecords = await Attendance.find({
-          staffId,
-          date: { $gte: startDate, $lte: endDate },
-        }).sort({ date: 1 })
-        
-        const summary = await AttendanceSummary.findOne({ staffId, year, month })
-        
-        return res.status(200).json({
-          success: true,
-          data: {
-            staff,
-            period: { month, year },
-            records: attendanceRecords,
-            summary,
-          },
-        })
-      } else {
-        // All staff monthly report
-        const startDate = new Date(year, month - 1, 1)
-        const endDate = new Date(year, month, 0)
-        
-        const summaries = await AttendanceSummary.find({ year, month })
-          .populate("staffId", "fullName staffId staffType designation")
-          .sort({ "staffId.fullName": 1 })
-        
-        return res.status(200).json({
-          success: true,
-          data: {
-            period: { month, year },
-            summaries,
-          },
-        })
-      }
-    } else if (reportType === "annual") {
-      if (staffId) {
-        // Individual annual report
-        const summaries = await AttendanceSummary.find({ staffId, year })
-          .sort({ month: 1 })
-        
-        // Calculate annual totals
-        const annualStats = summaries.reduce(
-          (stats, summary) => {
-            stats.daysPresent += summary.daysPresent
-            stats.daysAbsent += summary.daysAbsent
-            stats.daysHalfDay += summary.daysHalfDay
-            stats.daysOnLeave += summary.daysOnLeave
-            stats.totalWorkingHours += summary.totalWorkingHours
-            stats.lateCount += summary.lateCount
-            stats.earlyDepartureCount += summary.earlyDepartureCount
-            return stats
-          },
-          {
-            daysPresent: 0,
-            daysAbsent: 0,
-            daysHalfDay: 0,
-            daysOnLeave: 0,
-            totalWorkingHours: 0,
-            lateCount: 0,
-            earlyDepartureCount: 0,
-          }
-        )
-        
-        // Calculate annual attendance percentage
-        const totalWorkingDays = summaries.reduce((total, summary) => total + summary.totalWorkingDays, 0)
-        annualStats.attendancePercentage = totalWorkingDays > 0
-          ? Math.round(((annualStats.daysPresent + annualStats.daysHalfDay * 0.5 + annualStats.daysOnLeave) / totalWorkingDays) * 100)
-          : 0
-        
-        return res.status(200).json({
-          success: true,
-          data: {
-            staff,
-            year,
-            monthlySummaries: summaries,
-            annualStats,
-          },
-        })
-      } else {
-        // All staff annual report
-        const allStaff = await Staff.find().select("_id fullName staffId staffType designation")
-        const staffIds = allStaff.map(staff => staff._id)
-        
-        // Get all summaries for the year
-        const allSummaries = await AttendanceSummary.find({
-          staffId: { $in: staffIds },
-          year,
-        })
-        
-        // Group summaries by staff
-        const staffSummaries = {}
-        allStaff.forEach(staff => {
-          staffSummaries[staff._id] = {
-            staff,
-            summaries: [],
-            annualStats: {
-              daysPresent: 0,
-              daysAbsent: 0,
-              daysHalfDay: 0,
-              daysOnLeave: 0,
-              totalWorkingHours: 0,
-              lateCount: 0,
-              earlyDepartureCount: 0,
-              attendancePercentage: 0,
-              totalWorkingDays: 0,
-            },
-          }
-        })
-        
-        // Populate summaries and calculate stats
-        allSummaries.forEach(summary => {
-          const staffId = summary.staffId.toString()
-          if (staffSummaries[staffId]) {
-            staffSummaries[staffId].summaries.push(summary)
-            staffSummaries[staffId].annualStats.daysPresent += summary.daysPresent
-            staffSummaries[staffId].annualStats.daysAbsent += summary.daysAbsent
-            staffSummaries[staffId].annualStats.daysHalfDay += summary.daysHalfDay
-            staffSummaries[staffId].annualStats.daysOnLeave += summary.daysOnLeave
-            staffSummaries[staffId].annualStats.totalWorkingHours += summary.totalWorkingHours
-            staffSummaries[staffId].annualStats.lateCount += summary.lateCount
-            staffSummaries[staffId].annualStats.earlyDepartureCount += summary.earlyDepartureCount
-            staffSummaries[staffId].annualStats.totalWorkingDays += summary.totalWorkingDays
-          }
-        })
-        
-        // Calculate attendance percentages and convert to array
-        const reportData = Object.values(staffSummaries).map(data => {
-          data.annualStats.attendancePercentage = data.annualStats.totalWorkingDays > 0
-            ? Math.round(((data.annualStats.daysPresent + data.annualStats.daysHalfDay * 0.5 + data.annualStats.daysOnLeave) / data.annualStats.totalWorkingDays) * 100)
-            : 0
-          return data
-        })
-        
-        // Sort by attendance percentage (highest first)
-        reportData.sort((a, b) => b.annualStats.attendancePercentage - a.annualStats.attendancePercentage)
-        
-        return res.status(200).json({
-          success: true,
-          data: {
-            year,
-            staffReports: reportData,
-          },
-        })
-      }
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid report type. Use 'monthly' or 'annual'",
-      })
-    }
-  } catch (error) {
-    console.error("Error generating attendance report:", error)
-    res.status(500).json({
-      success: false,
-      message: "Failed to generate attendance report",
-      error: error.message,
-    })
-  }
-}
+    const { class: className, date, students } = req.body;
+    const attendanceDate = new Date(date).setHours(0,0,0,0);
 
+    let record = await StudentAttendance.findOne({ class: className, date: attendanceDate }) ||
+      new StudentAttendance({ class: className, date: attendanceDate, students: [] });
+
+    record.students = students.map(s => ({
+      studentId: s.studentId,
+      status: s.status,
+      notes: s.notes
+    }));
+
+    await record.save();
+    await addRecentActivity(req.user.id, `Updated attendance for ${className}`);
+
+    res.status(200).json({ success: true, data: record });
+  } catch (error) {
+    console.error("Save student attendance error:", error);
+    res.status(500).json({ success: false, message: "Attendance save failed", error: error.message });
+  }
+};
+
+const getStudentAttendanceStats = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const records = await StudentAttendance.find({ 
+      "students.studentId": studentId 
+    });
+
+    const stats = records.reduce((acc, record) => {
+      const student = record.students.find(s => s.studentId === studentId);
+      if (student) {
+        acc.total++;
+        acc[student.status]++;
+        if (student.status === 'late') acc.late++;
+      }
+      return acc;
+    }, { total: 0, present: 0, absent: 0, late: 0 });
+
+    stats.attendancePercentage = stats.total > 0 
+      ? Math.round((stats.present / stats.total) * 100)
+      : 0;
+
+    res.status(200).json({ success: true, data: stats });
+  } catch (error) {
+    console.error("Student stats error:", error);
+    res.status(500).json({ success: false, message: "Failed to get stats", error: error.message });
+  }
+};
+
+module.exports = {
+  // Staff Exports
+  markStaffAttendance,
+  manualStaffAttendance,
+  getStaffAttendance,
+  updateStaffSummary,
+
+  // Student Exports
+  getClassAttendance,
+  saveStudentAttendance,
+  getStudentAttendanceStats
+};

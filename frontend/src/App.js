@@ -1,10 +1,14 @@
+"use client"
+
 import { Routes, Route, Navigate } from "react-router-dom"
 import { ToastProvider, useToast } from "./hooks/use-toast"
 import ToastContainer from "./Components/ui/ToastContainer"
+
+// Layout components
 import Nav from "./Components/Nav/Nav"
 import "./styles/layout.css"
 
-// Layout components
+// Student Management Pages
 import StudentManagement from "./Components/StudentManagement/StudentManagement"
 import StudentEnrollment from "./Components/StudentEnrollment/StudentEnroll"
 import StudentProfile from "./Components/StudentProfile/StudentProfile"
@@ -13,6 +17,7 @@ import ClassAttendance from "./Components/Attendance/ClassAttendance"
 import ExamResults from "./Components/ExamResults/ExamResults"
 import AddExamResult from "./Components/ExamResults/AddExamResult"
 import EditExamResult from "./Components/ExamResults/EditExamResult"
+import UpdateStudent from "./Components/StudentEnrollment/UpdateStudent"
 
 // Inventory Management Pages
 import InventoryDashboard from "./pages/InventoryDashboard"
@@ -37,10 +42,7 @@ import StaffProfiles from "./Components/Staff/StaffProfiles"
 // Dashboard
 import Dashboard from "./pages/Dashboard"
 
-// Add the import for UpdateStudent
-import UpdateStudent from "./Components/StudentEnrollment/UpdateStudent"
-
-// Toast wrapper component to access context
+// Toast wrapper component
 const ToastWrapper = () => {
   const { toasts, dismiss } = useToast()
   return <ToastContainer toasts={toasts} onClose={dismiss} />
@@ -65,10 +67,10 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 function App() {
   return (
     <ToastProvider>
-      <div className="layout-container">
+      <div className="bg-gray-50 min-h-screen">
         <Nav />
         <div className="main-content">
-          <div className="page-container">
+          <main className="p-4">
             <Routes>
               {/* Dashboard Route */}
               <Route path="/dashboard" element={<Dashboard />} />
@@ -98,7 +100,7 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="/staff/login" element={<StaffLogin />} />
-              
+
               {/* Protected Admin Routes */}
               <Route path="/staff/admin" element={
                 <ProtectedRoute allowedRoles={['admin']}>
@@ -148,7 +150,7 @@ function App() {
                 </ProtectedRoute>
               } />
             </Routes>
-          </div>
+          </main>
         </div>
         <ToastWrapper />
       </div>

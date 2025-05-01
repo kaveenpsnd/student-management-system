@@ -1,38 +1,40 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
-const AttendanceSchema = new Schema({
-  staffId: {
+const AttendanceRecordSchema = new Schema({
+  studentId: {
     type: String,
     required: true,
-    ref: "Staff",
-  },
-  date: {
-    type: Date,
-    required: true,
-  },
-  checkIn: {
-    type: Date,
-    required: true,
-  },
-  checkOut: {
-    type: Date,
-  },
-  workingHours: {
-    type: Number,
-    default: 0,
+    ref: "Student",
   },
   status: {
     type: String,
-    enum: ["Present", "Absent", "Half-Day", "On Leave"],
-    default: "Present",
+    enum: ["present", "absent", "late"],
+    default: "present",
+    required: true,
   },
   notes: {
     type: String,
   },
 })
 
-// Compound index to ensure uniqueness of staffId and date combination
-AttendanceSchema.index({ staffId: 1, date: 1 }, { unique: true })
+const StudentAttendanceSchema = new Schema({
+  class: {
+    type: String,
+    required: true,
+  },
+  date: {
+    type: Date,
+    required: true,
+  },
+  students: [AttendanceRecordSchema],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+})
 
-module.exports = mongoose.model("Attendance", AttendanceSchema)
+// Ensure uniqueness of class and date
+StudentAttendanceSchema.index({ class: 1, date: 1 }, { unique: true })
+
+module.exports = mongoose.model("StudentAttendance", StudentAttendanceSchema)

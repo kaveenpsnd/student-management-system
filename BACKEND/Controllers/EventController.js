@@ -1,6 +1,6 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
-const Schema = mongoose.Schema
+const Schema = mongoose.Schema;
 
 const eventSchema = new Schema(
   {
@@ -8,11 +8,15 @@ const eventSchema = new Schema(
     eventType: { type: String, enum: ["Academic", "Sport", "Extra-Curriculer"] },
     eventDate: { type: Date, required: true },
     location: { type: String, required: true },
-    status: { type: String, enum: ["Pending", "Approved", "Rejected"], default: "Pending" },
+    status: {
+      type: String,
+      enum: ["Pending", "Approved", "Rejected"],
+      default: "Pending",
+    },
   },
-  { timestamps: true },
-)
+  { timestamps: true }
+);
 
-const Event = mongoose.model("Event", eventSchema)
+const Event = mongoose.model("Event", eventSchema);
 
-module.exports = Event
+module.exports = Event;
