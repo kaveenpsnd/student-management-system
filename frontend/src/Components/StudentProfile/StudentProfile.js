@@ -7,10 +7,12 @@ import "../../styles/student-profile.css"
 // Add import for DeleteConfirmationModal at the top of the file
 import DeleteConfirmationModal from "../common/DeleteConfirmationModal"
 import { studentService } from "../../services/studentService"
+import { useToast } from "../../hooks/use-toast"
 
 const StudentProfile = () => {
   const { studentId } = useParams()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [student, setStudent] = useState(null)
   const [attendanceStats, setAttendanceStats] = useState({ present: 0, absent: 0 })
   const [activeTab, setActiveTab] = useState("personal")
@@ -27,6 +29,23 @@ const StudentProfile = () => {
         // Fetch student data
         const studentResponse = await axios.get(`http://localhost:5000/student/${studentId}`)
         setStudent(studentResponse.data)
+
+        // Set enrolled courses based on subjects
+        if (studentResponse.data.subjects && studentResponse.data.subjects.length > 0) {
+          // If subjects is a string, convert to array
+          const subjectsArray =
+            typeof studentResponse.data.subjects === "string"
+              ? studentResponse.data.subjects.split(",").map((s) => s.trim())
+              : studentResponse.data.subjects
+
+          const courses = subjectsArray.map((subject) => ({
+            name: subject,
+            professor: getProfessorForSubject(subject),
+            schedule: getScheduleForSubject(subject),
+          }))
+
+          setEnrolledCourses(courses)
+        }
 
         // Fetch attendance stats
         try {
@@ -66,23 +85,6 @@ const StudentProfile = () => {
           setAttendanceRecords([])
         }
 
-        // Set enrolled courses based on subjects
-        if (studentResponse.data.subjects && studentResponse.data.subjects.length > 0) {
-          // If subjects is a string, convert to array
-          const subjectsArray =
-            typeof studentResponse.data.subjects === "string"
-              ? studentResponse.data.subjects.split(",")
-              : studentResponse.data.subjects
-
-          const courses = subjectsArray.map((subject) => ({
-            name: subject,
-            professor: getProfessorForSubject(subject),
-            schedule: getScheduleForSubject(subject),
-          }))
-
-          setEnrolledCourses(courses)
-        }
-
         setLoading(false)
       } catch (error) {
         console.error("Error fetching student details:", error)
@@ -90,9 +92,27 @@ const StudentProfile = () => {
         setLoading(false)
       }
     }
-
     fetchData()
   }, [studentId])
+
+  const handleDeleteStudent = async () => {
+    try {
+      await studentService.deleteStudent(studentId)
+      toast({
+        title: "Success",
+        description: "Student deleted successfully",
+        variant: "success",
+      })
+      navigate("/student-profiles")
+    } catch (error) {
+      console.error("Error deleting student:", error)
+      toast({
+        title: "Error",
+        description: "Failed to delete student. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
 
   // Helper functions to generate professor names and schedules
   const getProfessorForSubject = (subject) => {
@@ -156,18 +176,6 @@ Report generated on: ${new Date().toLocaleString()}
 
   const handleContactParent = () => {
     window.location.href = `mailto:${student.emailAddress}?subject=Regarding ${student.firstName} ${student.lastName} (${student.studentId})&body=Dear ${student.guardianName},%0D%0A%0D%0AI am writing to discuss ${student.firstName}'s academic progress.%0D%0A%0D%0ARegards,%0D%0ASchool Administration`
-  }
-
-  // Add handleDeleteStudent function before the return statement
-  const handleDeleteStudent = async () => {
-    try {
-      await studentService.deleteStudent(studentId)
-      // Remove the alert and just navigate to the student list page
-      navigate("/student-profiles")
-    } catch (error) {
-      console.error("Error deleting student:", error)
-      alert("Failed to delete student. Please try again.")
-    }
   }
 
   if (loading) {
@@ -347,13 +355,17 @@ Report generated on: ${new Date().toLocaleString()}
           <div className="profile-card courses-card">
             <h3 className="card-title">Enrolled Courses</h3>
             <div className="courses-list">
-              {enrolledCourses.map((course, index) => (
-                <div key={index} className="course-item">
-                  <div className="course-name">{course.name}</div>
-                  <div className="course-professor">{course.professor}</div>
-                  <div className="course-schedule">{course.schedule}</div>
-                </div>
-              ))}
+              {enrolledCourses && enrolledCourses.length > 0 ? (
+                enrolledCourses.map((course, index) => (
+                  <div key={index} className="course-item">
+                    <div className="course-name">{course.name}</div>
+                    <div className="course-professor">{course.professor}</div>
+                    <div className="course-schedule">{course.schedule}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="no-courses">No courses enrolled</div>
+              )}
             </div>
           </div>
         </div>
@@ -427,4 +439,3 @@ Report generated on: ${new Date().toLocaleString()}
 }
 
 export default StudentProfile
-

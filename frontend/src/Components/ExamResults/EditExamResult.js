@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import axios from "axios"
 import { ArrowLeft, Plus, Trash2 } from "lucide-react"
+import "../../styles/exam-form.css"
 
 const EditExamResult = () => {
   const { studentId, resultId } = useParams()
@@ -135,22 +136,40 @@ const EditExamResult = () => {
     return { totalScore, averageScore }
   }
 
+  // Update the handleSubmit function to match the expected backend format
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     // Calculate total and average scores
     const { totalScore, averageScore } = calculateTotalAndAverage()
 
+    // Format subjects to match the backend model
+    const formattedSubjects = formData.subjects
+      .filter((subject) => subject.name.trim() !== "")
+      .map((subject) => ({
+        name: subject.name,
+        marksObtained: Number.parseInt(subject.score),
+        maximumMarks: 100,
+        grade: subject.grade,
+        status: subject.remarks,
+      }))
+
     // Prepare data for submission
     const resultData = {
-      ...formData,
-      totalScore,
-      averageScore,
-      subjects: formData.subjects.filter((subject) => subject.name.trim() !== ""),
+      studentId,
+      examName: formData.examName,
+      term: formData.term,
+      year: formData.year,
+      subjects: formattedSubjects,
+      totalMarks: totalScore,
+      maximumTotalMarks: formattedSubjects.length * 100,
+      percentage: formattedSubjects.length > 0 ? ((totalScore / (formattedSubjects.length * 100)) * 100).toFixed(2) : 0,
+      finalGrade: calculateFinalGrade(averageScore),
+      teacherRemarks: formData.teacherRemarks,
     }
 
     try {
-      // Assuming there's an API endpoint for updating exam results
+      // Send the formatted data to the API
       await axios.put(`http://localhost:5000/exam-results/${resultId}`, resultData)
       alert("Exam result updated successfully!")
       navigate(`/exam-results/${studentId}`)
@@ -160,17 +179,31 @@ const EditExamResult = () => {
     }
   }
 
+  // Add a helper function to calculate final grade
+  const calculateFinalGrade = (averageScore) => {
+    const score = Number.parseFloat(averageScore)
+    if (score >= 90) return "A+"
+    if (score >= 80) return "A"
+    if (score >= 75) return "B+"
+    if (score >= 70) return "B"
+    if (score >= 65) return "C+"
+    if (score >= 60) return "C"
+    if (score >= 55) return "D+"
+    if (score >= 50) return "D"
+    return "F"
+  }
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      <div className="loading-spinner">
+        <div className="spinner"></div>
       </div>
     )
   }
 
   if (!student) {
     return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+      <div className="error-message">
         Student not found. The student may have been deleted or you don't have permission to view this profile.
       </div>
     )
@@ -179,55 +212,46 @@ const EditExamResult = () => {
   const { totalScore, averageScore } = calculateTotalAndAverage()
 
   return (
-    <div className="max-w-5xl mx-auto px-4">
+    <div className="exam-form-container">
       {/* Back button */}
-      <div className="mb-6">
-        <button
-          onClick={() => navigate(`/exam-results/${studentId}`)}
-          className="flex items-center text-gray-600 hover:text-gray-900"
-        >
-          <ArrowLeft className="w-5 h-5 mr-1" />
+      <div className="back-button-container">
+        <button onClick={() => navigate(`/exam-results/${studentId}`)} className="back-button">
+          <ArrowLeft className="" />
           Back to Exam Results
         </button>
       </div>
 
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4">
-          <h1 className="text-xl font-bold text-white">
+      <div className="exam-header-card">
+        <div className="exam-header-gradient">
+          <h1 className="exam-header-title">
             Edit Exam Result for {student.firstName} {student.lastName}
           </h1>
-          <p className="text-purple-100">
+          <p className="exam-header-subtitle">
             Student ID: {student.studentId} | {student.grade}, {student.section}
           </p>
         </div>
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div className="exam-form-card">
+        <form onSubmit={handleSubmit} className="exam-form">
+          <div className="exam-form-grid">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Exam Name</label>
+              <label className="exam-form-label">Exam Name</label>
               <input
                 type="text"
                 name="examName"
                 value={formData.examName}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="exam-form-input"
                 placeholder="e.g. Midterm Examination"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Term</label>
-              <select
-                name="term"
-                value={formData.term}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                required
-              >
+              <label className="exam-form-label">Term</label>
+              <select name="term" value={formData.term} onChange={handleChange} className="exam-form-input" required>
                 <option value="">Select Term</option>
                 <option value="First Term">First Term</option>
                 <option value="Second Term">Second Term</option>
@@ -235,106 +259,88 @@ const EditExamResult = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+              <label className="exam-form-label">Year</label>
               <input
                 type="number"
                 name="year"
                 value={formData.year}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="exam-form-input"
                 required
               />
             </div>
           </div>
 
           {/* Subjects */}
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-medium">Subjects</h3>
-              <button
-                type="button"
-                onClick={addSubject}
-                className="flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800"
-              >
-                <Plus className="w-4 h-4" />
+          <div className="subjects-section">
+            <div className="subjects-header">
+              <h3 className="subjects-title">Subjects</h3>
+              <button type="button" onClick={addSubject} className="add-subject-button">
+                <Plus className="" />
                 Add Subject
               </button>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+            <div className="subjects-table-container">
+              <table className="subjects-table">
                 <thead>
                   <tr>
-                    <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Subject
-                    </th>
-                    <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Score
-                    </th>
-                    <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Grade
-                    </th>
-                    <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Remarks
-                    </th>
-                    <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Action
-                    </th>
+                    <th className="">Subject</th>
+                    <th className="">Score</th>
+                    <th className="">Grade</th>
+                    <th className="">Remarks</th>
+                    <th className="">Action</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {formData.subjects.map((subject, index) => (
                     <tr key={index}>
-                      <td className="px-4 py-3">
+                      <td className="">
                         <input
                           type="text"
                           value={subject.name}
                           onChange={(e) => handleSubjectChange(index, "name", e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="exam-form-input"
                           placeholder="Subject name"
                           required
                         />
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="">
                         <input
                           type="number"
                           min="0"
                           max="100"
                           value={subject.score}
                           onChange={(e) => handleSubjectChange(index, "score", e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="exam-form-input"
                           placeholder="0-100"
                           required
                         />
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="">
                         <input
                           type="text"
                           value={subject.grade}
                           onChange={(e) => handleSubjectChange(index, "grade", e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="exam-form-input"
                           placeholder="Grade"
                           readOnly
                         />
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="">
                         <input
                           type="text"
                           value={subject.remarks}
                           onChange={(e) => handleSubjectChange(index, "remarks", e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="exam-form-input"
                           placeholder="Remarks"
                           readOnly
                         />
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="">
                         {formData.subjects.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeSubject(index)}
-                            className="text-red-600 hover:text-red-800"
-                          >
-                            <Trash2 className="w-5 h-5" />
+                          <button type="button" onClick={() => removeSubject(index)} className="remove-subject-button">
+                            <Trash2 className="" />
                           </button>
                         )}
                       </td>
@@ -346,36 +352,33 @@ const EditExamResult = () => {
           </div>
 
           {/* Summary */}
-          <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm text-gray-500 mb-1">Total Score</p>
-              <p className="text-xl font-semibold">{totalScore}</p>
+          <div className="exam-summary-grid">
+            <div className="summary-card">
+              <p className="summary-label">Total Score</p>
+              <p className="summary-value">{totalScore}</p>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm text-gray-500 mb-1">Average Score</p>
-              <p className="text-xl font-semibold">{averageScore}</p>
+            <div className="summary-card">
+              <p className="summary-label">Average Score</p>
+              <p className="summary-value">{averageScore}</p>
             </div>
           </div>
 
           {/* Teacher Remarks */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Teacher's Remarks</label>
+          <div className="remarks-field">
+            <label className="exam-form-label">Teacher's Remarks</label>
             <textarea
               name="teacherRemarks"
               value={formData.teacherRemarks}
               onChange={handleChange}
               rows="3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="remarks-textarea"
               placeholder="Add your comments about the student's performance"
             ></textarea>
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-            >
+          <div className="form-actions">
+            <button type="submit" className="submit-button">
               Update Exam Result
             </button>
           </div>
@@ -386,4 +389,3 @@ const EditExamResult = () => {
 }
 
 export default EditExamResult
-

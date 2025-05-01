@@ -3,10 +3,12 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
+import { useToast } from "../../hooks/use-toast"
 import "../../styles/student-enrollment.css"
 
 const StudentEnrollment = () => {
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
@@ -29,7 +31,7 @@ const StudentEnrollment = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef(null)
 
-  const availableSubjects = ["Mathematics", "Science", "English", "History", "IT"]
+  const availableSubjects = ["Mathematics", "Science", "English", "History", "IT", "Geography" , "Physical Education", "Art" , "Music" , "Economics", "Sinhala" , "English Literature", "Business Studies"]
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -87,11 +89,20 @@ const StudentEnrollment = () => {
         headers: { "Content-Type": "multipart/form-data" },
       })
 
-      alert("Student enrolled successfully!")
+      toast({
+        title: "Success",
+        description: "Student enrolled successfully!",
+        variant: "success",
+      })
+
       navigate("/student-profiles")
     } catch (error) {
       console.error("Error enrolling student:", error)
-      alert("Failed to enroll student. Please try again.")
+      toast({
+        title: "Error",
+        description: "Failed to enroll student. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
@@ -187,6 +198,11 @@ const StudentEnrollment = () => {
               <label className="field-label">Grade</label>
               <select name="grade" value={formData.grade} onChange={handleChange} required className="field-select">
                 <option value="">Select Grade</option>
+                <option value="Grade 1">Grade 1</option>
+                <option value="Grade 2">Grade 2</option>
+                <option value="Grade 3">Grade 3</option>
+                <option value="Grade 4">Grade 4</option>
+                <option value="Grade 5">Grade 5</option>
                 <option value="Grade 6">Grade 6</option>
                 <option value="Grade 7">Grade 7</option>
                 <option value="Grade 8">Grade 8</option>
@@ -203,6 +219,9 @@ const StudentEnrollment = () => {
                 <option value="Section A">Section A</option>
                 <option value="Section B">Section B</option>
                 <option value="Section C">Section C</option>
+                <option value="Section D">Section D</option>
+                <option value="Section E">Section E</option>
+                <option value="Section F">Section F</option>
               </select>
             </div>
             <div className="form-field">
@@ -375,4 +394,3 @@ const StudentEnrollment = () => {
 }
 
 export default StudentEnrollment
-

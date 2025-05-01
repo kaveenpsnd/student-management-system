@@ -18,4 +18,3 @@ router.put("/:resultId", ExamResultsController.updateExamResult)
 router.delete("/:resultId", ExamResultsController.deleteExamResult)
 
 module.exports = router
-

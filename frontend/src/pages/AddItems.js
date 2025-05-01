@@ -2,16 +2,27 @@
 import { useNavigate } from "react-router-dom"
 import AddItemForm from "../Components/InventoryManagement/AddItemForm"
 import { inventoryApi } from "../services/api"
+import { useToast } from "../hooks/use-toast"
 
 function AddItem() {
   const navigate = useNavigate()
+  const { toast } = useToast()
 
   const handleSubmit = async (formData) => {
     try {
       await inventoryApi.createItem(formData)
+      toast({
+        title: "Success",
+        description: "Item added successfully",
+        variant: "success",
+      })
       navigate("/inventory")
     } catch (error) {
-      alert("Failed to add item. Please try again.")
+      toast({
+        title: "Error",
+        description: "Failed to add item. Please try again.",
+        variant: "destructive",
+      })
       console.error(error)
     }
   }
@@ -24,4 +35,3 @@ function AddItem() {
 }
 
 export default AddItem
-

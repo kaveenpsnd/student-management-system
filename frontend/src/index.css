@@ -1,24 +1,45 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 :root {
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --primary-light: #eef2ff;
-  --secondary: #10b981;
-  --secondary-hover: #059669;
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
-  --warning: #f59e0b;
-  --warning-hover: #d97706;
-  --success: #10b981;
-  --success-hover: #059669;
-  --background: #f9fafb;
+  /* Primary Colors */
+  --primary: #1e3a8a;
+  --primary-hover: #152a66;
+  --primary-light: #e0e7ff;
+
+  /* Secondary Colors */
+  --secondary: #64748b;
+  --secondary-hover: #4b5563;
+
+  /* Accent Color */
+  --accent: #00ffff;
+  --accent-hover: #00cccc;
+
+  /* Background Colors */
+  --background: #f8fafc;
+  --background-dark: #1e293b;
+
+  /* Card and UI Elements */
   --card: #ffffff;
-  --text-primary: #111827;
+  --card-dark: #293548;
+
+  /* Text Colors */
+  --text-primary: #1f2937;
   --text-secondary: #4b5563;
   --text-muted: #6b7280;
+  --text-light: #e2e8f0;
+
+  /* Status Colors */
+  --success: #10b981;
+  --success-hover: #059669;
+  --warning: #f59e0b;
+  --warning-hover: #d97706;
+  --danger: #f43f5e;
+  --danger-hover: #e11d48;
+
+  /* Border Colors */
   --border: #e5e7eb;
   --border-light: #f3f4f6;
+  --border-dark: #374151;
 }
 
 body {
@@ -47,12 +68,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--secondary);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--secondary-hover);
 }
 
 /* Animations */
@@ -83,6 +104,41 @@ body {
   100% {
     transform: rotate(360deg);
   }
+}
+
+/* Animation utilities */
+.animate-in {
+  animation-duration: 150ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes slide-in-from-right-full {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-in-from-right-full {
+  animation-name: slide-in-from-right-full;
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-out {
+  animation-name: fade-out;
 }
 
 /* Utility classes */
@@ -137,4 +193,3 @@ body {
 .backdrop-blur-sm {
   backdrop-filter: blur(4px) !important;
 }
-

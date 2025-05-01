@@ -29,4 +29,3 @@ const ExamResultSchema = new Schema({
 })
 
 module.exports = mongoose.model("ExamResult", ExamResultSchema)
-

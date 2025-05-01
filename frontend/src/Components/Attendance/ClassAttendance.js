@@ -3,67 +3,100 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import "../../styles/student-attendance.css"
+import { useToast } from "../../hooks/use-toast"
 
 const ClassAttendance = () => {
-  const [selectedClass, setSelectedClass] = useState("")
+  const [selectedGrade, setSelectedGrade] = useState("")
+  const [selectedSection, setSelectedSection] = useState("")
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0])
   const [students, setStudents] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [allStudents, setAllStudents] = useState([])
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [classes, setClasses] = useState([])
+  const [grades, setGrades] = useState([])
+  const [sections, setSections] = useState([])
+  const { toast } = useToast()
 
-  // Fetch available classes (grades and sections)
+  // Fetch all students and extract grades and sections
   useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/student")
-        const allStudents = response.data
-
-        // Extract unique grade-section combinations
-        const uniqueClasses = [...new Set(allStudents.map((student) => `${student.grade} - ${student.section}`))].sort()
-
-        setClasses(uniqueClasses)
-
-        // Set default selected class if available
-        if (uniqueClasses.length > 0 && !selectedClass) {
-          setSelectedClass(uniqueClasses[0])
-        }
-      } catch (err) {
-        console.error("Error fetching classes:", err)
-        setError("Failed to load classes. Please try again.")
-      }
-    }
-
-    fetchClasses()
-  }, [selectedClass])
-
-  // Fetch students when class or date changes
-  useEffect(() => {
-    if (!selectedClass) return
-
     const fetchStudents = async () => {
       try {
         setLoading(true)
-
-        // Parse grade and section from selected class
-        const [grade, section] = selectedClass.split(" - ")
-
-        // Fetch students in the selected class
         const response = await axios.get("http://localhost:5000/student")
-        const allStudents = response.data
-        const filteredStudents = allStudents.filter(
-          (student) => student.grade === grade && student.section === section.trim(),
-        )
+        const students = response.data
+
+        // Set all students
+        setAllStudents(students)
+
+        // Define all available grades and sections
+        const allGrades = [
+          "Grade 1",
+          "Grade 2",
+          "Grade 3",
+          "Grade 4",
+          "Grade 5",
+          "Grade 6",
+          "Grade 7",
+          "Grade 8",
+          "Grade 9",
+          "Grade 10",
+          "Grade 11",
+          "Grade 12",
+          "Grade 13",
+        ]
+
+        const allSections = ["Section A", "Section B", "Section C", "Section D", "Section E", "Section F", "Section G"]
+
+        setGrades(allGrades)
+        setSections(allSections)
+
+        setLoading(false)
+      } catch (err) {
+        console.error("Error fetching students:", err)
+        setError("Failed to load students. Please try again.")
+        setLoading(false)
+      }
+    }
+
+    fetchStudents()
+  }, [])
+
+  // Filter students when grade or section changes
+  useEffect(() => {
+    const filterStudents = async () => {
+      try {
+        // Filter students based on selected grade and section
+        let filteredStudents = [...allStudents]
+
+        if (selectedGrade && selectedGrade !== "") {
+          filteredStudents = filteredStudents.filter((student) => student.grade === selectedGrade)
+        }
+
+        if (selectedSection && selectedSection !== "") {
+          filteredStudents = filteredStudents.filter((student) => student.section === selectedSection)
+        }
 
         // Check if attendance exists for this class and date
+        const classIdentifier =
+          selectedGrade && selectedSection ? `${selectedGrade} - ${selectedSection}` : "All Classes"
+
         try {
-          const attendanceResponse = await axios.get(`http://localhost:5000/attendance/class/${selectedClass}`, {
+          const attendanceResponse = await axios.get(`http://localhost:5000/attendance/class/${classIdentifier}`, {
             params: { date: selectedDate },
           })
 
           // If attendance exists, use it
           if (attendanceResponse.data && attendanceResponse.data.students) {
-            setStudents(attendanceResponse.data.students)
+            // Merge attendance data with student details
+            const attendanceMap = new Map(attendanceResponse.data.students.map((record) => [record.studentId, record]))
+
+            const studentsWithAttendance = filteredStudents.map((student) => ({
+              ...student,
+              status: attendanceMap.get(student.studentId)?.status || "present",
+              notes: attendanceMap.get(student.studentId)?.notes || "",
+            }))
+
+            setStudents(studentsWithAttendance)
           } else {
             // Otherwise, initialize with default values
             setStudents(
@@ -84,17 +117,14 @@ const ClassAttendance = () => {
             })),
           )
         }
-
-        setLoading(false)
       } catch (err) {
-        console.error("Error fetching students:", err)
-        setError("Failed to load students. Please try again.")
-        setLoading(false)
+        console.error("Error filtering students:", err)
+        setError("Failed to filter students. Please try again.")
       }
     }
 
-    fetchStudents()
-  }, [selectedClass, selectedDate])
+    filterStudents()
+  }, [selectedGrade, selectedSection, selectedDate, allStudents])
 
   const handleStatusChange = (studentId, status) => {
     setStudents(students.map((student) => (student.studentId === studentId ? { ...student, status } : student)))
@@ -106,8 +136,19 @@ const ClassAttendance = () => {
 
   const handleSaveAttendance = async () => {
     try {
+      if (students.length === 0) {
+        toast({
+          title: "No Students",
+          description: "No students found to save attendance for.",
+          variant: "warning",
+        })
+        return
+      }
+
+      const classIdentifier = selectedGrade && selectedSection ? `${selectedGrade} - ${selectedSection}` : "All Classes"
+
       const attendanceData = {
-        class: selectedClass,
+        class: classIdentifier,
         date: selectedDate,
         students: students.map((student) => ({
           studentId: student.studentId,
@@ -117,19 +158,36 @@ const ClassAttendance = () => {
       }
 
       await axios.post("http://localhost:5000/attendance", attendanceData)
-      alert("Attendance saved successfully!")
+      toast({
+        title: "Success",
+        description: "Attendance saved successfully!",
+        variant: "success",
+      })
     } catch (err) {
       console.error("Error saving attendance:", err)
-      alert("Failed to save attendance. Please try again.")
+      toast({
+        title: "Error",
+        description: "Failed to save attendance. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
   const handleDownloadAttendance = () => {
+    if (students.length === 0) {
+      toast({
+        title: "No Students",
+        description: "No students to download attendance for.",
+        variant: "warning",
+      })
+      return
+    }
+
     // Create CSV content
     const headers = ["Student ID", "Name", "Status", "Notes"]
     const rows = students.map((student) => [
       student.studentId,
-      `${student.firstName} ${student.lastName}`,
+      `${student.firstName || ""} ${student.lastName || ""}`,
       student.status,
       student.notes,
     ])
@@ -141,7 +199,7 @@ const ClassAttendance = () => {
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.setAttribute("href", url)
-    link.setAttribute("download", `attendance_${selectedClass}_${selectedDate}.csv`)
+    link.setAttribute("download", `attendance_${selectedGrade}_${selectedSection}_${selectedDate}.csv`)
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -177,16 +235,33 @@ const ClassAttendance = () => {
       {/* Filters */}
       <div className="filters-container">
         <div className="filter-group">
-          <label className="filter-label">Select Class</label>
-          <select value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)} className="filter-select">
-            {classes.length === 0 && <option value="">Loading classes...</option>}
-            {classes.map((cls) => (
-              <option key={cls} value={cls}>
-                {cls}
+          <label className="filter-label">Select Grade</label>
+          <select value={selectedGrade} onChange={(e) => setSelectedGrade(e.target.value)} className="filter-select">
+            <option value="">All Grades</option>
+            {grades.map((grade) => (
+              <option key={grade} value={grade}>
+                {grade}
               </option>
             ))}
           </select>
         </div>
+
+        <div className="filter-group">
+          <label className="filter-label">Select Section</label>
+          <select
+            value={selectedSection}
+            onChange={(e) => setSelectedSection(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">All Sections</option>
+            {sections.map((section) => (
+              <option key={section} value={section}>
+                {section}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="filter-group">
           <label className="filter-label">Select Date</label>
           <input
@@ -214,6 +289,10 @@ const ClassAttendance = () => {
 
         {loading ? (
           <div style={{ padding: "2rem", textAlign: "center" }}>Loading students...</div>
+        ) : students.length === 0 ? (
+          <div style={{ padding: "2rem", textAlign: "center" }}>
+            No students found for the selected grade and section. Please select a different combination.
+          </div>
         ) : (
           <>
             <table className="attendance-table">
@@ -233,13 +312,15 @@ const ClassAttendance = () => {
                       <div className="student-cell">
                         <div className="student-avatar">
                           {student.photo ? (
-                            <img src={`http://localhost:5000${student.photo}`} alt={student.firstName} />
-                          ) : (
+                            <img src={`http://localhost:5000${student.photo}`} alt={student.firstName || ""} />
+                          ) : student.firstName ? (
                             student.firstName.charAt(0)
+                          ) : (
+                            "?"
                           )}
                         </div>
                         <span>
-                          {student.firstName} {student.lastName}
+                          {student.firstName || "Unknown"} {student.lastName || ""}
                         </span>
                       </div>
                     </td>
@@ -303,4 +384,3 @@ const ClassAttendance = () => {
 }
 
 export default ClassAttendance
-

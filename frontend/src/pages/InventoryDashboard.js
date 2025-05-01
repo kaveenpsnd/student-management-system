@@ -5,7 +5,6 @@ import { Link } from "react-router-dom"
 import { inventoryApi } from "../services/api"
 import LoadingSpinner from "../Components/common/LoadingSpinner"
 import ErrorMessage from "../Components/common/ErrorMessage"
-import { Package, DollarSign, AlertTriangle, ArrowRight, BarChart2, TrendingUp } from "lucide-react"
 
 function InventoryDashboard() {
   const [stats, setStats] = useState({
@@ -67,46 +66,46 @@ function InventoryDashboard() {
   if (error) return <ErrorMessage message={error} />
 
   return (
-    <div className="animate-fade-in">
+    <div className="inventory-container">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Inventory Dashboard</h1>
         <p className="text-gray-600">Overview of your inventory status and statistics</p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <div className="flex items-center">
-            <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mr-4">
-              <Package className="w-6 h-6" />
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-content">
+            <div className="stat-icon purple">
+              <span>📦</span>
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Total Items</p>
-              <p className="text-2xl font-bold">{stats.totalItems}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <div className="flex items-center">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 mr-4">
-              <DollarSign className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Total Value</p>
-              <p className="text-2xl font-bold">Rs.{stats.totalValue.toFixed(2)}</p>
+            <div className="stat-info">
+              <p className="stat-label">Total Items</p>
+              <p className="stat-value">{stats.totalItems}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <div className="flex items-center">
-            <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 mr-4">
-              <AlertTriangle className="w-6 h-6" />
+        <div className="stat-card">
+          <div className="stat-content">
+            <div className="stat-icon green">
+              <span>💰</span>
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Low Stock Items</p>
-              <p className="text-2xl font-bold">{stats.lowStockItems.length}</p>
+            <div className="stat-info">
+              <p className="stat-label">Total Value</p>
+              <p className="stat-value">Rs.{stats.totalValue.toFixed(2)}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-content">
+            <div className="stat-icon yellow">
+              <span>⚠️</span>
+            </div>
+            <div className="stat-info">
+              <p className="stat-label">Low Stock Items</p>
+              <p className="stat-value">{stats.lowStockItems.length}</p>
             </div>
           </div>
         </div>
@@ -117,7 +116,7 @@ function InventoryDashboard() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
             <div className="flex items-center">
-              <BarChart2 className="w-5 h-5 text-indigo-600 mr-2" />
+              <span className="text-indigo-600 mr-2">📊</span>
               <h3 className="font-semibold text-gray-800">Category Distribution</h3>
             </div>
           </div>
@@ -149,7 +148,7 @@ function InventoryDashboard() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
             <div className="flex items-center">
-              <TrendingUp className="w-5 h-5 text-green-600 mr-2" />
+              <span className="text-green-600 mr-2">📈</span>
               <h3 className="font-semibold text-gray-800">Value by Category</h3>
             </div>
           </div>
@@ -182,11 +181,11 @@ function InventoryDashboard() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
           <div className="flex items-center">
-            <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />
+            <span className="text-yellow-600 mr-2">⚠️</span>
             <h3 className="font-semibold text-gray-800">Low Stock Items</h3>
           </div>
-          <Link to="/inventory" className="text-sm text-indigo-600 hover:text-indigo-800 flex items-center">
-            View All <ArrowRight className="w-4 h-4 ml-1" />
+          <Link to="/inventory/list" className="text-sm text-indigo-600 hover:text-indigo-800 flex items-center">
+            View All <span className="ml-1">➡️</span>
           </Link>
         </div>
 
@@ -221,4 +220,3 @@ function InventoryDashboard() {
 }
 
 export default InventoryDashboard
-
