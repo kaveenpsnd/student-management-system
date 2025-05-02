@@ -1,37 +1,39 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const attendanceSchema = new mongoose.Schema({
+const AttendanceRecordSchema = new Schema({
   studentId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Student',
-    required: true
+    type: String,
+    required: true,
+    ref: "Student",
+  },
+  status: {
+    type: String,
+    enum: ["present", "absent", "late"],
+    default: "present",
+    required: true,
+  },
+  notes: {
+    type: String,
+  },
+});
+
+const AttendanceSchema = new Schema({
+  class: {
+    type: String,
+    required: true,
   },
   date: {
     type: Date,
     required: true,
-    default: Date.now
   },
-  status: {
-    type: String,
-    enum: ['Present', 'Absent', 'Late'],
-    required: true
+  students: [AttendanceRecordSchema],
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
-  remarks: {
-    type: String,
-    default: ''
-  },
-  recordedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Staff',
-    required: true
-  }
-}, {
-  timestamps: true
 });
 
-// Create compound index for studentId and date
-attendanceSchema.index({ studentId: 1, date: 1 }, { unique: true });
+AttendanceSchema.index({ class: 1, date: 1 }, { unique: true });
 
-const Attendance = mongoose.model('Attendance', attendanceSchema);
-
-module.exports = Attendance; 
+module.exports = mongoose.model("Attendance", AttendanceSchema);

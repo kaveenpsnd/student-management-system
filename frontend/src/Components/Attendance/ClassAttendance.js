@@ -17,15 +17,6 @@ const ClassAttendance = () => {
   const [sections, setSections] = useState([])
   const { toast } = useToast()
 
-  // Test toast on component mount
-  useEffect(() => {
-    toast({
-      title: "Component Loaded",
-      description: "Testing toast functionality",
-      variant: "info"
-    })
-  }, [toast])
-
   // Fetch all students and extract grades and sections
   useEffect(() => {
     const fetchStudents = async () => {
@@ -85,51 +76,45 @@ const ClassAttendance = () => {
           filteredStudents = filteredStudents.filter((student) => student.section === selectedSection)
         }
 
-        // Only try to fetch attendance if both grade and section are selected
-        if (selectedGrade && selectedSection) {
-          const classIdentifier = `${selectedGrade} - ${selectedSection}`
-          try {
-            const attendanceResponse = await axios.get(`http://localhost:5000/attendance/class/${encodeURIComponent(classIdentifier)}`, {
-              params: { date: selectedDate },
-            })
+        // Check if attendance exists for this class and date
+        const classIdentifier =
+          selectedGrade && selectedSection ? `${selectedGrade} - ${selectedSection}` : "All Classes"
 
-            if (attendanceResponse.data && attendanceResponse.data.students) {
-              const attendanceMap = new Map(attendanceResponse.data.students.map((record) => [record.studentId, record]))
+        try {
+          const attendanceResponse = await axios.get(`http://localhost:5000/attendance/class/${classIdentifier}`, {
+            params: { date: selectedDate },
+          })
 
-              const studentsWithAttendance = filteredStudents.map((student) => ({
-                ...student,
-                status: attendanceMap.get(student.studentId)?.status || "present",
-                notes: attendanceMap.get(student.studentId)?.notes || "",
-              }))
+          // If attendance exists, use it
+          if (attendanceResponse.data && attendanceResponse.data.students) {
+            // Merge attendance data with student details
+            const attendanceMap = new Map(attendanceResponse.data.students.map((record) => [record.studentId, record]))
 
-              setStudents(studentsWithAttendance)
-            } else {
-              setStudents(
-                filteredStudents.map((student) => ({
-                  ...student,
-                  status: "present",
-                  notes: "",
-                }))
-              )
-            }
-          } catch (err) {
-            // If no attendance exists yet, initialize with default values
+            const studentsWithAttendance = filteredStudents.map((student) => ({
+              ...student,
+              status: attendanceMap.get(student.studentId)?.status || "present",
+              notes: attendanceMap.get(student.studentId)?.notes || "",
+            }))
+
+            setStudents(studentsWithAttendance)
+          } else {
+            // Otherwise, initialize with default values
             setStudents(
               filteredStudents.map((student) => ({
                 ...student,
                 status: "present",
                 notes: "",
-              }))
+              })),
             )
           }
-        } else {
-          // If grade or section is not selected, just show the filtered list
+        } catch (err) {
+          // If no attendance record exists, initialize with default values
           setStudents(
             filteredStudents.map((student) => ({
               ...student,
               status: "present",
               notes: "",
-            }))
+            })),
           )
         }
       } catch (err) {
@@ -150,9 +135,9 @@ const ClassAttendance = () => {
   }
 
   const handleSaveAttendance = async () => {
-    // First, let's test if the toast works
+    // Test toast first
     toast({
-      title: "Save Clicked",
+      title: "Save Initiated",
       description: "Attempting to save attendance...",
       variant: "info"
     })
@@ -162,7 +147,7 @@ const ClassAttendance = () => {
         toast({
           title: "Warning",
           description: "Please select both grade and section before saving attendance.",
-          variant: "warning",
+          variant: "warning"
         })
         return
       }
@@ -171,66 +156,36 @@ const ClassAttendance = () => {
         toast({
           title: "Warning",
           description: "No students found to save attendance for.",
-          variant: "warning",
+          variant: "warning"
         })
         return
       }
 
-      const classIdentifier = `${selectedGrade} - ${selectedSection}`
+      const classIdentifier = selectedGrade && selectedSection ? `${selectedGrade} - ${selectedSection}` : "All Classes"
 
-      // Format the attendance data
       const attendanceData = {
         class: classIdentifier,
         date: selectedDate,
         students: students.map((student) => ({
           studentId: student.studentId,
-          firstName: student.firstName,
-          lastName: student.lastName,
-          grade: student.grade,
-          section: student.section,
-          status: student.status || "present",
-          notes: student.notes || "",
-        })),
-      }
-
-      console.log('Sending attendance data:', attendanceData);
-
-      // Make the API call with proper headers
-      const response = await axios.post(
-        "http://localhost:5000/attendance", 
-        attendanceData,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      )
-
-      console.log('Response:', response);
-
-      if (response.status === 200 || response.status === 201) {
-        toast({
-          title: "Success",
-          description: `Attendance saved successfully for ${classIdentifier}!`,
-          variant: "success",
-        })
-
-        // Refresh the students list to show updated data
-        const updatedStudents = students.map(student => ({
-          ...student,
           status: student.status || "present",
           notes: student.notes || ""
         }))
-        setStudents(updatedStudents)
-      } else {
-        throw new Error('Failed to save attendance')
       }
+
+      await axios.post("http://localhost:5000/attendance", attendanceData)
+      
+      toast({
+        title: "Success",
+        description: "Attendance saved successfully!",
+        variant: "success"
+      })
     } catch (err) {
       console.error("Error saving attendance:", err)
       toast({
         title: "Error",
-        description: err.response?.data?.message || "Failed to save attendance. Please try again.",
-        variant: "destructive",
+        description: "Failed to save attendance. Please try again.",
+        variant: "destructive"
       })
     }
   }
@@ -340,21 +295,10 @@ const ClassAttendance = () => {
         <div className="table-header">
           <h2 className="table-title">Student Attendance</h2>
           <div className="action-buttons">
-            <button 
-              onClick={handleDownloadAttendance} 
-              className="download-button"
-              type="button"
-            >
+            <button onClick={handleDownloadAttendance} className="download-button">
               Download Attendance
             </button>
-            <button 
-              onClick={() => {
-                console.log('Save button clicked');
-                handleSaveAttendance();
-              }} 
-              className="save-button"
-              type="button"
-            >
+            <button onClick={handleSaveAttendance} className="save-button">
               Save Attendance
             </button>
           </div>

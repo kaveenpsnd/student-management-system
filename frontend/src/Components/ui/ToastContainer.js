@@ -9,7 +9,7 @@ const ToastContainer = () => {
   if (!toasts || toasts.length === 0) return null
 
   return (
-    <div className="toast-container" role="region" aria-label="Notifications">
+    <div className="toast-container">
       {toasts.map((toast) => (
         <Toast
           key={toast.id}
