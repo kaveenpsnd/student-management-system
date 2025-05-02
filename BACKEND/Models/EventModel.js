@@ -47,4 +47,5 @@ EventRequestSchema.pre('save', async function (next) {
   }
 });
 
-module.exports = mongoose.model('EventRequest', EventRequestSchema);
+module.exports = mongoose.model('EventRequest', EventRequestSchema, 'events');
+
