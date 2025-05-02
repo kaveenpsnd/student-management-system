@@ -1,37 +1,29 @@
-"use client"
-import { useNavigate } from "react-router-dom"
-import AddItemForm from "../Components/InventoryManagement/AddItemForm"
-import { inventoryApi } from "../services/api"
-import { useToast } from "../hooks/use-toast"
-
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import AddItemForm from '../Components/InventoryManagement/AddItemForm';
+import { inventoryApi } from '../services/api';
+import "../styles/AddItemForm.css";
 function AddItem() {
-  const navigate = useNavigate()
-  const { toast } = useToast()
+  const navigate = useNavigate();
 
   const handleSubmit = async (formData) => {
     try {
-      await inventoryApi.createItem(formData)
-      toast({
-        title: "Success",
-        description: "Item added successfully",
-        variant: "success",
-      })
-      navigate("/inventory")
+      await inventoryApi.createItem(formData);
+      navigate('/inventory');
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to add item. Please try again.",
-        variant: "destructive",
-      })
-      console.error(error)
+      alert('Failed to add item. Please try again.');
+      console.error(error);
     }
-  }
+  };
 
   return (
-    <div>
+    <div className="add-item-page">
+      <div className="page-header">
+        <h2>Add New Inventory Item</h2>
+      </div>
       <AddItemForm onSubmit={handleSubmit} />
     </div>
-  )
+  );
 }
 
-export default AddItem
+export default AddItem;

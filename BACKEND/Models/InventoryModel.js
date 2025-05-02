@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const inventorySchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -7,6 +7,7 @@ const inventorySchema = new mongoose.Schema({
   price: { type: Number, required: true },
 });
 
-const Inventory = mongoose.model('Inventory', inventorySchema);
+// Check if the model already exists before defining it
+const Inventory = mongoose.models.Inventory || mongoose.model("Inventory", inventorySchema);
 
 module.exports = Inventory;

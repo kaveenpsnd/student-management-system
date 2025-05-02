@@ -23,6 +23,7 @@ import InventoryList from "./pages/InventoryList"
 import AddItem from "./pages/AddItems"
 import EditItem from "./pages/EditItem"
 import ItemDetails from "./pages/ItemDetails"
+import StockReport from "./Components/StockReport"
 
 // Event Management Pages
 import CalendarPage from "./Components/EventManagement/Calendar"
@@ -67,6 +68,7 @@ function App() {
               <Route path="/inventory/list" element={<InventoryList />} />
               <Route path="/inventory/add" element={<AddItem />} />
               <Route path="/inventory/edit/:id" element={<EditItem />} />
+              <Route path="/inventory/reports/stock" element={<StockReport />} />
               <Route path="/inventory/:id" element={<ItemDetails />} />
 
               {/* Event Management Routes */}

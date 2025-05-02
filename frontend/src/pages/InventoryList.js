@@ -1,94 +1,67 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { inventoryApi } from "../services/api"
-import ItemList from "../Components/InventoryManagement/ItemList"
-import LoadingSpinner from "../Components/common/LoadingSpinner"
-import ErrorMessage from "../Components/common/ErrorMessage"
-import { useToast } from "../hooks/use-toast"
-
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { inventoryApi } from '../services/api';
+import ItemList from '../Components/InventoryManagement/ItemList';
+import LoadingSpinner from '../Components/common/LoadingSpinner';
+import ErrorMessage from '../Components/common/ErrorMessage';
 function InventoryList() {
-  const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const { toast } = useToast()
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await inventoryApi.getAllItems()
-        setItems(response.data)
-        setLoading(false)
+        console.log('Fetching inventory items...');
+        const response = await inventoryApi.getAllItems();
+        console.log('Received items:', response.data);
+        setItems(response.data);
+        setLoading(false);
       } catch (err) {
-        setError("Failed to fetch inventory items")
-        setLoading(false)
+        console.error('Error fetching items:', err);
+        setError('Failed to fetch inventory items: ' + (err.response?.data?.message || err.message));
+        setLoading(false);
       }
-    }
+    };
 
-    fetchItems()
-  }, [])
+    fetchItems();
+  }, []);
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this item?")) {
+    if (window.confirm('Are you sure you want to delete this item?')) {
       try {
-        await inventoryApi.deleteItem(id)
-        setItems(items.filter((item) => item._id !== id))
-        toast({
-          title: "Success",
-          description: "Item deleted successfully",
-          variant: "success",
-        })
+        console.log('Deleting item:', id);
+        await inventoryApi.deleteItem(id);
+        console.log('Item deleted successfully');
+        setItems(items.filter(item => item._id !== id));
       } catch (err) {
-        toast({
-          title: "Error",
-          description: "Failed to delete item",
-          variant: "destructive",
-        })
+        console.error('Error deleting item:', err);
+        setError('Failed to delete item: ' + (err.response?.data?.message || err.message));
       }
     }
-  }
+  };
 
-  if (loading) return <LoadingSpinner />
-  if (error) return <ErrorMessage message={error} />
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage message={error} />;
 
   return (
-    <div className="inventory-container">
-      <div className="inventory-header">
-        <div>
-          <h1 className="inventory-title">Inventory Items</h1>
-          <p className="inventory-subtitle">Manage your inventory items and stock levels</p>
-        </div>
-        <Link to="/inventory/add" className="add-item-button">
-          <span className="add-icon">➕</span>
+    <div className="inventory-list-page">
+      <div className="page-header">
+        <h2>Inventory Items</h2>
+        <Link to="/inventory/add" className="btn btn-primary">
           Add New Item
         </Link>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <div className="p-6">
-          {items.length === 0 ? (
-            <div className="bg-gray-50 p-8 text-center rounded-lg border border-gray-200">
-              <div className="mx-auto w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-4">
-                <span className="text-2xl">📦</span>
-              </div>
-              <h3 className="text-lg font-medium text-gray-800 mb-2">No Inventory Items</h3>
-              <p className="text-gray-600 mb-4">You haven't added any inventory items yet.</p>
-              <Link
-                to="/inventory/add"
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 inline-flex items-center"
-              >
-                <span className="mr-2">➕</span>
-                Add Your First Item
-              </Link>
-            </div>
-          ) : (
-            <ItemList items={items} onDelete={handleDelete} />
-          )}
+      {items.length === 0 ? (
+        <div className="empty-state">
+          <p>No inventory items found. Click the button above to add your first item.</p>
         </div>
-      </div>
+      ) : (
+        <ItemList items={items} onDelete={handleDelete} />
+      )}
     </div>
-  )
+  );
 }
 
-export default InventoryList
+export default InventoryList;

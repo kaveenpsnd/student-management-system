@@ -19,6 +19,7 @@ const createItem = async (req, res) => {
   }
 };
 
+
 // Read - Get all inventory items
 const getAllItems = async (req, res) => {
   try {
