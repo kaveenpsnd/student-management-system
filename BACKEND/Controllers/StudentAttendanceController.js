@@ -1,4 +1,4 @@
-const Attendance = require("../Models/AttendanceModel")
+const Attendance = require("../Models/StudentAttendanceModel")
 const Student = require("../Models/StudentModel")
 const { addRecentActivity } = require("./RecentActivityController")
 
