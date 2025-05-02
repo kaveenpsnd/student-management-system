@@ -26,6 +26,11 @@ import ItemDetails from "./pages/ItemDetails"
 
 // Event Management Pages
 import CalendarPage from "./Components/EventManagement/Calendar"
+import AddEventForm from './Components/EventManagement/AddEventForm';
+import MyEvents from './Components/EventManagement/MyEvents';
+import EventRequests from './Components/EventManagement/EventRequests';
+import EditEventForm from './Components/EventManagement/EditEventForm';
+
 
 
 // Dashboard
@@ -71,6 +76,11 @@ function App() {
 
               {/* Event Management Routes */}
               <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/add-event" element={<AddEventForm />} />
+              <Route path="/my-events" element={<MyEvents />} />
+              <Route path="/event-requests" element={<EventRequests />} />
+              <Route path="/edit-event/:id" element={<EditEventForm />} />
+
 
             </Routes>
           </main>
