@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
 })
 
 // Connect to MongoDB
-const MONGODB_URI = "mongodb+srv://admin:itp25@mkv.yzfyd75.mongodb.net/SSMS"
+const MONGODB_URI = "mongodb+srv://admin:itp25@mkv.5cddqys.mongodb.net/SSMS"
 const PORT = 5000
 
 

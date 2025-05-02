@@ -1,19 +1,33 @@
 const EventModel = require("../Models/EventModel");
-const { addRecentActivity } = require("./RecentActivityController");
 
-// Create a new event request
+// Create a new event
 const createEvent = async (req, res) => {
   try {
+    const { eventName, eventType, grade, date, startTime, endTime, createdBy } = req.body;
+
+    // Validate required fields
+    if (!eventName || !eventType || !grade || !date || !startTime || !endTime || !createdBy) {
+      return res.status(400).json({ 
+        message: "All fields are required" 
+      });
+    }
+
     const newEvent = new EventModel({
-      ...req.body,
-      createdBy: req.user.id,
+      eventName,
+      eventType,
+      grade,
+      date,
+      startTime,
+      endTime,
+      createdBy,
+      status: 'Pending'
     });
 
     await newEvent.save();
-
-    await addRecentActivity(`${req.user.name} created an event: ${newEvent.eventName}`, "created");
-
-    res.status(201).json({ message: "Event created successfully!", eventId: newEvent._id });
+    res.status(201).json({ 
+      message: "Event created successfully!", 
+      event: newEvent 
+    });
   } catch (error) {
     console.error("Error creating event:", error);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -23,109 +37,148 @@ const createEvent = async (req, res) => {
 // Get all events (for admin)
 const getAllEvents = async (req, res) => {
   try {
-    const events = await EventModel.find();
+    const events = await EventModel.find().sort({ createdAt: -1 });
     res.status(200).json(events);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Get logged-in user's own events
+// Get events by creator and status
 const getMyEvents = async (req, res) => {
   try {
-    const events = await EventModel.find({ createdBy: req.user.id });
+    const { createdBy, status } = req.query;
+    const query = { createdBy };
+    
+    if (status) {
+      query.status = status;
+    }
+
+    const events = await EventModel.find(query).sort({ createdAt: -1 });
     res.status(200).json(events);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Get a specific event request by ID
+// Get events for calendar (approved events)
+const getCalendarEvents = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const query = { 
+      status: 'Approved',
+      date: {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      }
+    };
+
+    const events = await EventModel.find(query);
+    res.status(200).json(events);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get a specific event by ID
 const getEventById = async (req, res) => {
   try {
-    const event = await EventModel.findOne({ _id: req.params.id });
-
-    if (!event) return res.status(404).json({ message: "Event not found" });
-
+    const event = await EventModel.findById(req.params.id);
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
     res.status(200).json(event);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Update event only if user is owner and status is pending
+// Update event (only if pending)
 const updateEventById = async (req, res) => {
   try {
     const event = await EventModel.findById(req.params.id);
+    
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+    
+    if (event.status !== "Pending") {
+      return res.status(400).json({ message: "Cannot update non-pending event" });
+    }
 
-    if (!event) return res.status(404).json({ message: "Event not found" });
-    if (event.createdBy !== req.user.id) return res.status(403).json({ message: "Unauthorized" });
-    if (event.status !== "Pending") return res.status(400).json({ message: "Cannot update non-pending event" });
-
-    const updatedEvent = await EventModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedEvent = await EventModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    
     res.status(200).json(updatedEvent);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Delete event only if user is owner and status is pending
+// Delete event (only if pending)
 const deleteEventById = async (req, res) => {
   try {
     const event = await EventModel.findById(req.params.id);
-
-    if (!event) return res.status(404).json({ message: "Event not found" });
-    if (event.createdBy !== req.user.id) return res.status(403).json({ message: "Unauthorized" });
-    if (event.status !== "Pending") return res.status(400).json({ message: "Cannot delete non-pending event" });
+    
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+    
+    if (event.status !== "Pending") {
+      return res.status(400).json({ message: "Cannot delete non-pending event" });
+    }
 
     await EventModel.findByIdAndDelete(req.params.id);
-    await addRecentActivity(`${event.eventName} event was deleted`, "deleted");
-
     res.status(200).json({ message: "Event deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Admin-only approve event
+// Approve event
 const approveEvent = async (req, res) => {
-  const { eventId } = req.params;
-
   try {
-    const event = await EventModel.findOneAndUpdate(
-      { _id: eventId },
+    const event = await EventModel.findByIdAndUpdate(
+      req.params.id,
       { status: "Approved" },
       { new: true }
     );
 
-    if (!event) return res.status(404).json({ message: "Event not found" });
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
 
-    await addRecentActivity(`${event.eventName} event was approved`, "approved");
-
-    res.status(200).json({ message: "Event approved successfully", event });
+    res.status(200).json({ 
+      message: "Event approved successfully", 
+      event 
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// Admin-only reject event
+// Reject event
 const rejectEvent = async (req, res) => {
-  const { eventId } = req.params;
-
   try {
-    const event = await EventModel.findOneAndUpdate(
-      { _id: eventId },
+    const event = await EventModel.findByIdAndUpdate(
+      req.params.id,
       { status: "Rejected" },
       { new: true }
     );
 
-    if (!event) return res.status(404).json({ message: "Event not found" });
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
 
-    await addRecentActivity(`${event.eventName} event was rejected`, "rejected");
-
-    res.status(200).json({ message: "Event rejected successfully", event });
+    res.status(200).json({ 
+      message: "Event rejected successfully", 
+      event 
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -133,6 +186,7 @@ module.exports = {
   createEvent,
   getAllEvents,
   getMyEvents,
+  getCalendarEvents,
   getEventById,
   updateEventById,
   deleteEventById,
