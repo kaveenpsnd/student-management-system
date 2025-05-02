@@ -47,12 +47,12 @@ const Nav = () => {
 
       {/* Sidebar Navigation */}
       <div className={`sidebar ${isMobileMenuOpen ? "mobile-open" : ""}`}>
-        <div className="sidebar-header">
-          <div className="sidebar-logo">
-            <span>🎓</span>
-          </div>
-          <h1 className="sidebar-title">EduAdmin</h1>
+      <div className="sidebar-header">
+        <div className="sidebar-logo">
+          <img src="/MKVLogo.jpg" alt="MKV Logo" style={{ width: "40px", height: "40px" }} />
         </div>
+        <h1 className="sidebar-title">MKV</h1>
+      </div>
 
         <div className="sidebar-content">
           <ul className="sidebar-menu">
