@@ -18,7 +18,7 @@ const AdminLeaveManagement = () => {
 
   useEffect(() => {
     fetchLeaves()
-  }, [statusFilter, dateRange])
+  }, [fetchLeaves])
 
   const fetchLeaves = async () => {
     try {

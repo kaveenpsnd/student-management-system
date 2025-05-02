@@ -2,20 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Table, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  faSearch, 
   faUser, 
-  faEnvelope, 
-  faPhone, 
-  faMapMarkerAlt, 
-  faUserTie,
+  faEdit, 
+  faTrash, 
+  faPlus, 
+  faFileExcel,
   faChalkboardTeacher,
   faUserShield,
-  faIdCard,
-  faCalendarAlt,
+  faFileExport,
+  faSearch,
   faFilter,
   faEye,
-  faFileExport,
-  faFileDownload
+  faFileDownload,
+  faIdCard,
+  faUserTie,
+  faEnvelope,
+  faPhone,
+  faMapMarkerAlt,
+  faCalendarAlt
 } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { toast } from 'react-toastify';

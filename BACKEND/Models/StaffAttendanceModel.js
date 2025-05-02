@@ -1,6 +1,8 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
-const StaffAttendanceSchema = new mongoose.Schema(
+const Schema = mongoose.Schema;
+
+const StaffAttendanceSchema = new Schema(
   {
     staffId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -24,7 +26,7 @@ const StaffAttendanceSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Present", "Absent", "Half-Day", "Late", "Early Departure"],
+      enum: ["Present", "Absent", "Half-Day", "Late", "Early Departure", "On Leave"],
       default: "Present",
     },
     rfidCardId: {
@@ -68,28 +70,31 @@ const StaffAttendanceSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
-)
+  }
+);
 
-// Create a compound index to ensure a staff member has only one attendance record per day
-StaffAttendanceSchema.index({ staffId: 1, date: 1 }, { unique: true })
-StaffAttendanceSchema.index({ rfidCardId: 1, date: 1 })
-StaffAttendanceSchema.index({ year: 1, month: 1, staffId: 1 })
+// Create compound indexes
+StaffAttendanceSchema.index({ staffId: 1, date: 1 }, { unique: true });
+StaffAttendanceSchema.index({ rfidCardId: 1, date: 1 });
+StaffAttendanceSchema.index({ year: 1, month: 1, staffId: 1 });
 
 // Calculate working hours before saving
 StaffAttendanceSchema.pre("save", function(next) {
   if (this.checkIn && this.checkOut) {
-    const diffInMs = this.checkOut - this.checkIn
-    this.workingHours = (diffInMs / (1000 * 60 * 60)).toFixed(2)
+    const diffInMs = this.checkOut - this.checkIn;
+    this.workingHours = (diffInMs / (1000 * 60 * 60)).toFixed(2);
   }
-  next()
-})
+  next();
+});
 
 // Virtual for attendance percentage
 StaffAttendanceSchema.virtual('attendancePercentage').get(function() {
-  const totalDays = new Date(this.year, this.month, 0).getDate()
-  const presentDays = this.status === 'Present' ? 1 : 0
-  return (presentDays / totalDays) * 100
-})
+  const totalDays = new Date(this.year, this.month, 0).getDate();
+  const presentDays = this.status === 'Present' ? 1 : 0;
+  return (presentDays / totalDays) * 100;
+});
 
-module.exports = mongoose.model("StaffAttendance", StaffAttendanceSchema)
+module.exports = mongoose.model("StaffAttendance", StaffAttendanceSchema);
+
+
+

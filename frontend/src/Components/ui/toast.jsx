@@ -1,42 +1,52 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import "../../styles/toast.css"
 
-const Toast = ({ id, title, description, variant = "default", duration = 3000, onClose }) => {
+const Toast = ({ id, title, description, variant = "default", duration = 5000, onClose }) => {
   const [isExiting, setIsExiting] = useState(false)
+
+  const handleClose = useCallback(() => {
+    setIsExiting(true)
+    setTimeout(() => {
+      onClose(id)
+    }, 300)
+  }, [id, onClose])
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsExiting(true)
-
-      // Wait for exit animation to complete before removing
-      const exitTimer = setTimeout(() => {
-        onClose(id)
-      }, 300) // Match the duration of the exit animation
-
-      return () => clearTimeout(exitTimer)
-    }, duration)
+      handleClose()
+    }, duration - 300) // Subtract animation duration
 
     return () => clearTimeout(timer)
-  }, [id, duration, onClose])
+  }, [duration, handleClose])
 
-  const handleClose = () => {
-    setIsExiting(true)
-    setTimeout(() => onClose(id), 300)
-  }
+  const variantClass = variant === 'destructive' ? 'error' : variant
 
   return (
-    <div className={`toast toast-${variant} ${isExiting ? "toast-exit" : ""}`}>
+    <div 
+      role="alert"
+      aria-live="polite"
+      className={`toast toast-${variantClass} ${isExiting ? "toast-exit" : ""}`}
+    >
       <div className="toast-content">
         {title && <div className="toast-title">{title}</div>}
         {description && <div className="toast-description">{description}</div>}
       </div>
-      <button className="toast-close" onClick={handleClose}>
+      <button 
+        className="toast-close" 
+        onClick={handleClose}
+        aria-label="Close notification"
+      >
         ×
       </button>
       <div className="toast-progress">
-        <div className="toast-progress-bar"></div>
+        <div 
+          className="toast-progress-bar"
+          style={{
+            animationDuration: `${duration}ms`
+          }}
+        />
       </div>
     </div>
   )

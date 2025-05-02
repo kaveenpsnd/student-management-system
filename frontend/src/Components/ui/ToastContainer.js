@@ -1,12 +1,15 @@
 "use client"
+import { useToast } from "../../hooks/use-toast"
 import Toast from "./toast"
 import "../../styles/toast.css"
 
-const ToastContainer = ({ toasts, onClose }) => {
-  if (!toasts.length) return null
+const ToastContainer = () => {
+  const { toasts, dismiss } = useToast()
+
+  if (!toasts || toasts.length === 0) return null
 
   return (
-    <div className="toast-container">
+    <div className="toast-container" role="region" aria-label="Notifications">
       {toasts.map((toast) => (
         <Toast
           key={toast.id}
@@ -15,7 +18,7 @@ const ToastContainer = ({ toasts, onClose }) => {
           description={toast.description}
           variant={toast.variant}
           duration={toast.duration}
-          onClose={onClose}
+          onClose={dismiss}
         />
       ))}
     </div>

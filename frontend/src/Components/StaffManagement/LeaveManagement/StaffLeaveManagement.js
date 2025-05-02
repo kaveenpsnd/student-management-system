@@ -24,6 +24,10 @@ const StaffLeaveManagement = () => {
     }
   }, [staffId])
 
+  useEffect(() => {
+    fetchLeaveData();
+  }, [fetchLeaveData]);
+
   if (!staffId) {
     return (
       <div className="error-message">

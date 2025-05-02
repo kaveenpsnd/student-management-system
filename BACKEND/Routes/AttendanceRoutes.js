@@ -13,18 +13,18 @@ router.get("/student/:studentId", AttendanceController.getStudentAttendance)
 router.get("/stats/:studentId", AttendanceController.getStudentAttendanceStats)
 
 // Save attendance for a class
-router.post("/", AttendanceController.saveAttendance)
+router.post("/", AttendanceController.saveStudentAttendance)
 
 
 // ===== Staff Attendance Routes =====
 // Mark staff attendance
-router.post("/mark", AttendanceController.markAttendance)
+router.post("/staff/rfid", AttendanceController.markStaffAttendance)
 
-// Get specific staff attendance by ID
-router.get("/staff/:id", AttendanceController.getStaffAttendance)
+// Manual staff attendance entry
+router.post("/staff/manual", AttendanceController.manualStaffAttendance)
 
-// Admin manually records attendance
-router.post("/manual", AttendanceController.manualAttendance)
+// Get staff attendance records
+router.get("/staff/:staffId", AttendanceController.getStaffAttendance)
 
 // Admin retrieves all attendance records
 router.get("/", AttendanceController.getAllAttendance)

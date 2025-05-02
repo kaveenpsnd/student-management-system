@@ -1,7 +1,5 @@
-"use client"
-
 import { Routes, Route, Navigate } from "react-router-dom"
-import { ToastProvider, useToast } from "./hooks/use-toast"
+import { ToastProvider } from "./hooks/use-toast"
 import ToastContainer from "./Components/ui/ToastContainer"
 
 // Layout components
@@ -27,7 +25,6 @@ import EditItem from "./pages/EditItem"
 import ItemDetails from "./pages/ItemDetails"
 
 // Staff Management Pages
-import StaffManagement from "./Components/StaffManagement/StaffManagement"
 import StaffLogin from "./Components/StaffManagement/StaffLogin"
 import StaffEnrollment from "./Components/StaffManagement/StaffEnrollment/StaffEnrollment"
 import StaffProfile from "./Components/StaffManagement/StaffProfile/StaffProfile"
@@ -41,12 +38,6 @@ import StaffProfiles from "./Components/Staff/StaffProfiles"
 
 // Dashboard
 import Dashboard from "./pages/Dashboard"
-
-// Toast wrapper component
-const ToastWrapper = () => {
-  const { toasts, dismiss } = useToast()
-  return <ToastContainer toasts={toasts} onClose={dismiss} />
-}
 
 // Protected Route component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -94,27 +85,24 @@ function App() {
               <Route path="/inventory/:id" element={<ItemDetails />} />
 
               {/* Staff Management Routes */}
-              <Route path="/staff" element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <StaffProfiles />
-                </ProtectedRoute>
-              } />
               <Route path="/staff/login" element={<StaffLogin />} />
-
+              
               {/* Protected Admin Routes */}
               <Route path="/staff/admin" element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminDashboard />
                 </ProtectedRoute>
               } />
+              
+              <Route path="/staff" element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <StaffProfiles />
+                </ProtectedRoute>
+              } />
+
               <Route path="/staff/enrollment" element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <StaffEnrollment />
-                </ProtectedRoute>
-              } />
-              <Route path="/staff/profiles" element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <StaffProfiles />
                 </ProtectedRoute>
               } />
               <Route path="/staff/admin/leave" element={
@@ -149,10 +137,13 @@ function App() {
                   <StaffAttendance />
                 </ProtectedRoute>
               } />
+
+              {/* Redirect invalid routes to dashboard */}
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </main>
         </div>
-        <ToastWrapper />
+        <ToastContainer />
       </div>
     </ToastProvider>
   )

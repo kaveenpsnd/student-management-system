@@ -1,12 +1,25 @@
-import { Link, useLocation } from "react-router-dom"
+"use client"
+
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import {
+  faGraduationCap,
+  faUserGraduate,
+  faChalkboardTeacher,
+  faBoxes,
+  faMoneyBillWave,
+  faCalendarAlt,
+  faTachometerAlt,
+  faUsers
+} from "@fortawesome/free-solid-svg-icons"
 import "../../styles/nav.css"
 
 const Nav = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-  const [expandedMenus, setExpandedMenus] = useState({})
 
   useEffect(() => {
     const handleResize = () => {
@@ -28,20 +41,14 @@ const Nav = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
   }
 
-  const toggleSubmenu = (menu) => {
-    setExpandedMenus(prev => ({
-      ...prev,
-      [menu]: !prev[menu]
-    }))
-  }
-
+  // Define menu items
   const menuItems = [
-    { path: "/dashboard", icon: "📊", label: "Dashboard" },
-    { path: "/", icon: "👨‍🎓", label: "Students" },
-    { path: "/staff", icon: "👨‍🏫", label: "Staff" },
-    { path: "/inventory", icon: "📦", label: "Inventory" },
-    { path: "/payments", icon: "💰", label: "Payments" },
-    { path: "/calendar", icon: "📅", label: "Calendar" },
+    { path: "/dashboard", icon: faTachometerAlt, label: "Dashboard" },
+    { path: "/", icon: faUserGraduate, label: "Students" },
+    { path: "/staff", icon: faUsers, label: "Staff" },
+    { path: "/inventory", icon: faBoxes, label: "Assets" },
+    { path: "/payments", icon: faMoneyBillWave, label: "Payments" },
+    { path: "/calendar", icon: faCalendarAlt, label: "Calendar" },
   ]
 
   return (
@@ -53,24 +60,28 @@ const Nav = () => {
 
       {/* Sidebar Navigation */}
       <div className={`sidebar ${isMobileMenuOpen ? "mobile-open" : ""}`}>
+        {/* Sidebar Header */}
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <span>🎓</span>
-            <h2>Smart School</h2>
+            <FontAwesomeIcon icon={faGraduationCap} />
           </div>
+          <h1 className="sidebar-title">EduAdmin</h1>
         </div>
 
-        <nav className="sidebar-nav">
+        {/* Navigation Links */}
+        <nav className="nav-links">
           {menuItems.map((item) => (
-            <div key={item.path} className="nav-item">
-              <Link
-                to={item.path}
-                className={`nav-link ${isActive(item.path) ? 'active' : ''}`}
-              >
-                <span className="nav-icon">{item.icon}</span>
-                <span className="nav-label">{item.label}</span>
-              </Link>
-            </div>
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`sidebar-menu-link ${isActive(item.path) ? "active" : ""}`}
+              onClick={() => windowWidth < 1024 && setIsMobileMenuOpen(false)}
+            >
+              <span className="sidebar-menu-icon">
+                <FontAwesomeIcon icon={item.icon} />
+              </span>
+              <span>{item.label}</span>
+            </Link>
           ))}
         </nav>
       </div>

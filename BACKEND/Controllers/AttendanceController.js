@@ -263,6 +263,83 @@ const getStudentAttendanceStats = async (req, res) => {
   }
 };
 
+// Get attendance for a specific student
+const getStudentAttendance = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const attendance = await StudentAttendance.find({ studentId })
+      .sort({ date: -1 })
+      .populate('recordedBy', 'fullName');
+    
+    res.status(200).json({
+      success: true,
+      data: attendance
+    });
+  } catch (error) {
+    console.error('Error fetching student attendance:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch student attendance'
+    });
+  }
+};
+
+// Get all attendance records
+const getAllAttendance = async (req, res) => {
+  try {
+    const attendance = await StudentAttendance.find()
+      .populate('studentId', 'fullName')
+      .populate('recordedBy', 'fullName')
+      .sort({ date: -1 });
+    
+    res.status(200).json({
+      success: true,
+      data: attendance
+    });
+  } catch (error) {
+    console.error('Error fetching all attendance:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch attendance records'
+    });
+  }
+};
+
+// Generate attendance report
+const generateAttendanceReport = async (req, res) => {
+  try {
+    const { startDate, endDate, classId } = req.query;
+    const query = {};
+    
+    if (startDate && endDate) {
+      query.date = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
+    }
+    
+    if (classId) {
+      query.studentId = { $in: await Student.find({ classId }).select('_id') };
+    }
+    
+    const attendance = await StudentAttendance.find(query)
+      .populate('studentId', 'fullName classId')
+      .populate('recordedBy', 'fullName')
+      .sort({ date: -1 });
+    
+    res.status(200).json({
+      success: true,
+      data: attendance
+    });
+  } catch (error) {
+    console.error('Error generating attendance report:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to generate attendance report'
+    });
+  }
+};
+
 module.exports = {
   // Staff Exports
   markStaffAttendance,
@@ -273,5 +350,8 @@ module.exports = {
   // Student Exports
   getClassAttendance,
   saveStudentAttendance,
-  getStudentAttendanceStats
+  getStudentAttendanceStats,
+  getStudentAttendance,
+  getAllAttendance,
+  generateAttendanceReport
 };

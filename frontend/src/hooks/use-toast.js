@@ -1,8 +1,8 @@
 "use client"
 
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useState, useCallback } from "react"
 
-const TOAST_TIMEOUT = 3000 // 3 seconds
+const TOAST_TIMEOUT = 5000 // 5 seconds
 
 const ToastContext = createContext({
   toasts: [],
@@ -13,20 +13,42 @@ const ToastContext = createContext({
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([])
 
-  const toast = ({ title, description, variant = "default", duration = TOAST_TIMEOUT }) => {
+  const toast = useCallback(({ title, description, variant = "default", duration = TOAST_TIMEOUT }) => {
     const id = Math.random().toString(36).substring(2, 9)
-    const newToast = { id, title, description, variant, duration }
+    const newToast = { 
+      id, 
+      title, 
+      description, 
+      variant, 
+      duration,
+      createdAt: Date.now() 
+    }
 
-    setToasts((prevToasts) => [...prevToasts, newToast])
+    setToasts((prevToasts) => {
+      // Remove any existing toasts with the same title to prevent duplicates
+      const filteredToasts = prevToasts.filter(t => t.title !== title)
+      return [...filteredToasts, newToast]
+    })
+
+    // Automatically remove the toast after duration
+    setTimeout(() => {
+      dismiss(id)
+    }, duration)
 
     return id
-  }
+  }, [])
 
-  const dismiss = (id) => {
+  const dismiss = useCallback((id) => {
     setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id))
+  }, [])
+
+  const value = {
+    toasts,
+    toast,
+    dismiss
   }
 
-  return <ToastContext.Provider value={{ toasts, toast, dismiss }}>{children}</ToastContext.Provider>
+  return <ToastContext.Provider value={value}>{children}</ToastContext.Provider>
 }
 
 export const useToast = () => {

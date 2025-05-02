@@ -24,6 +24,10 @@ const StaffAttendance = () => {
     }
   }, [staffId])
 
+  useEffect(() => {
+    fetchAttendanceData();
+  }, [fetchAttendanceData]);
+
   if (!staffId) {
     return <div>Please log in to view attendance records.</div>;
   }
