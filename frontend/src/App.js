@@ -24,6 +24,10 @@ import AddItem from "./pages/AddItems"
 import EditItem from "./pages/EditItem"
 import ItemDetails from "./pages/ItemDetails"
 
+// Event Management Pages
+import CalendarPage from "./Components/EventManagement/Calendar"
+
+
 // Dashboard
 import Dashboard from "./pages/Dashboard"
 
@@ -64,6 +68,10 @@ function App() {
               <Route path="/inventory/add" element={<AddItem />} />
               <Route path="/inventory/edit/:id" element={<EditItem />} />
               <Route path="/inventory/:id" element={<ItemDetails />} />
+
+              {/* Event Management Routes */}
+              <Route path="/calendar" element={<CalendarPage />} />
+
             </Routes>
           </main>
         </div>
