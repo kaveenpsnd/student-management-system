@@ -4,7 +4,7 @@ const router = require("./Routes/StudentRoutes")
 const inventoryRoutes = require("./Routes/InventoryRoutes")
 const activityRoutes = require("./Routes/RecentActivityRoutes")
 const examResultsRoutes = require("./Routes/ExamResultsRoutes")
-const attendanceRoutes = require("./Routes/AttendanceRoutes")
+const attendanceRoutes = require("./Routes/StudentAttendanceRoutes")
 const eventRoutes = require("./Routes/EventRoutes")
 
 const cors = require("cors")

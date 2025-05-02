@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const AttendanceController = require("../Controllers/AttendanceController")
+const AttendanceController = require("../Controllers/StudentAttendanceController")
 
 // Get attendance for a class on a specific date
 router.get("/class/:className", AttendanceController.getClassAttendance)
