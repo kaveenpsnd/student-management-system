@@ -135,28 +135,12 @@ const ClassAttendance = () => {
   }
 
   const handleSaveAttendance = async () => {
-    // Test toast first
-    toast({
-      title: "Save Initiated",
-      description: "Attempting to save attendance...",
-      variant: "info"
-    })
-
     try {
-      if (!selectedGrade || !selectedSection) {
-        toast({
-          title: "Warning",
-          description: "Please select both grade and section before saving attendance.",
-          variant: "warning"
-        })
-        return
-      }
-
       if (students.length === 0) {
         toast({
-          title: "Warning",
+          title: "No Students",
           description: "No students found to save attendance for.",
-          variant: "warning"
+          variant: "warning",
         })
         return
       }
@@ -168,24 +152,23 @@ const ClassAttendance = () => {
         date: selectedDate,
         students: students.map((student) => ({
           studentId: student.studentId,
-          status: student.status || "present",
-          notes: student.notes || ""
-        }))
+          status: student.status,
+          notes: student.notes,
+        })),
       }
 
       await axios.post("http://localhost:5000/attendance", attendanceData)
-      
       toast({
         title: "Success",
         description: "Attendance saved successfully!",
-        variant: "success"
+        variant: "success",
       })
     } catch (err) {
       console.error("Error saving attendance:", err)
       toast({
         title: "Error",
         description: "Failed to save attendance. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       })
     }
   }

@@ -1,157 +1,156 @@
 .student-management-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
-
-.search-bar {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  margin-bottom: 1.5rem;
-  font-size: 0.875rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.page-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 1.5rem;
-}
-
-.management-cards {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-@media (min-width: 768px) {
-  .management-cards {
-    grid-template-columns: repeat(3, 1fr);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
   }
-}
-
-.management-card {
-  display: block;
-  padding: 1.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background-color: white;
-  text-align: center;
-  text-decoration: none;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.management-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.card-icon-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.card-icon {
-  width: 3rem;
-  height: 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.card-title {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: #111827;
-  margin-bottom: 0.25rem;
-}
-
-.card-description {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.recent-activity {
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background-color: white;
-  overflow: hidden;
-}
-
-.recent-activity-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.recent-activity-title {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: #111827;
-}
-
-.activity-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.activity-item {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.activity-item:last-child {
-  border-bottom: none;
-}
-
-.activity-content {
-  display: flex;
-  align-items: flex-start;
-}
-
-.activity-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 9999px;
-  background-color: #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #4b5563;
-  margin-right: 0.75rem;
-  margin-left: 15px;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.activity-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
   
-}
-
-.activity-details {
-  flex: 1;
-}
-
-.activity-text {
-  font-size: 0.875rem;
-  margin-bottom: 0.25rem;
-}
-
-.activity-name {
-  font-weight: 500;
-  color: #111827;
-}
-
-.activity-time {
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
+  .search-bar {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.5rem;
+  }
+  
+  .management-cards {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  @media (min-width: 768px) {
+    .management-cards {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  .management-card {
+    display: block;
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: white;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .management-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-icon-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  
+  .card-icon {
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .card-title {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 0.25rem;
+  }
+  
+  .card-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .recent-activity {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: white;
+    overflow: hidden;
+  }
+  
+  .recent-activity-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .recent-activity-title {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #111827;
+  }
+  
+  .activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .activity-item {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+  
+  .activity-content {
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .activity-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    background-color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  
+  .activity-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .activity-details {
+    flex: 1;
+  }
+  
+  .activity-text {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .activity-name {
+    font-weight: 500;
+    color: #111827;
+  }
+  
+  .activity-time {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+  
+  

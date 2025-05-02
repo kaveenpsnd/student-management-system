@@ -1,23 +1,11 @@
 "use client"
 
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { useState, useEffect } from "react"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import {
-  faGraduationCap,
-  faUserGraduate,
-  faChalkboardTeacher,
-  faBoxes,
-  faMoneyBillWave,
-  faCalendarAlt,
-  faTachometerAlt,
-  faUsers
-} from "@fortawesome/free-solid-svg-icons"
 import "../../styles/nav.css"
 
 const Nav = () => {
   const location = useLocation()
-  const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
@@ -41,14 +29,13 @@ const Nav = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
   }
 
-  // Define menu items
   const menuItems = [
-    { path: "/dashboard", icon: faTachometerAlt, label: "Dashboard" },
-    { path: "/", icon: faUserGraduate, label: "Students" },
-    { path: "/staff", icon: faUsers, label: "Staff" },
-    { path: "/inventory", icon: faBoxes, label: "Assets" },
-    { path: "/payments", icon: faMoneyBillWave, label: "Payments" },
-    { path: "/calendar", icon: faCalendarAlt, label: "Calendar" },
+    { path: "/dashboard", icon: "📊", label: "Dashboard" },
+    { path: "/", icon: "👨‍🎓", label: "Students" },
+    { path: "/staff", icon: "👨‍🏫", label: "Staff" },
+    { path: "/inventory", icon: "📦", label: "Inventory" },
+    { path: "/payments", icon: "💰", label: "Payments" },
+    { path: "/calendar", icon: "📅", label: "Calendar" },
   ]
 
   return (
@@ -60,34 +47,46 @@ const Nav = () => {
 
       {/* Sidebar Navigation */}
       <div className={`sidebar ${isMobileMenuOpen ? "mobile-open" : ""}`}>
-        {/* Sidebar Header */}
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <FontAwesomeIcon icon={faGraduationCap} />
+            <span>🎓</span>
           </div>
           <h1 className="sidebar-title">EduAdmin</h1>
         </div>
 
-        {/* Navigation Links */}
-        <nav className="nav-links">
-          {menuItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`sidebar-menu-link ${isActive(item.path) ? "active" : ""}`}
-              onClick={() => windowWidth < 1024 && setIsMobileMenuOpen(false)}
-            >
-              <span className="sidebar-menu-icon">
-                <FontAwesomeIcon icon={item.icon} />
-              </span>
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </nav>
+        <div className="sidebar-content">
+          <ul className="sidebar-menu">
+            {menuItems.map((item) => (
+              <li key={item.path} className="sidebar-menu-item">
+                <Link
+                  to={item.path}
+                  className={`sidebar-menu-link ${isActive(item.path) ? "active" : ""}`}
+                  onClick={() => windowWidth < 1024 && setIsMobileMenuOpen(false)}
+                >
+                  <span className="sidebar-menu-icon">{item.icon}</span>
+                  <span className="sidebar-menu-text">{item.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="sidebar-footer">
+          <div className="sidebar-user">
+            <div className="sidebar-user-avatar">A</div>
+            <div className="sidebar-user-info">
+              <p className="sidebar-user-name">Admin User</p>
+              <p className="sidebar-user-email">admin@school.edu</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Overlay for mobile */}
       {isMobileMenuOpen && windowWidth < 1024 && <div className="overlay" onClick={toggleMobileMenu} />}
+
+      {/* Main Content Container */}
+      <div className="main-content">{/* The rest of the app content will be rendered here */}</div>
     </>
   )
 }

@@ -1,31 +1,20 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const path = require("path");
-const fs = require("fs");
+const express = require("express")
+const mongoose = require("mongoose")
+const router = require("./Routes/StudentRoutes")
+const inventoryRoutes = require("./Routes/InventoryRoutes")
+const activityRoutes = require("./Routes/RecentActivityRoutes")
+const examResultsRoutes = require("./Routes/ExamResultsRoutes")
+const attendanceRoutes = require("./Routes/AttendanceRoutes") // Add this line
+const cors = require("cors")
+const path = require("path")
 
-// Import routes
-const studentRoutes = require("./Routes/StudentRoutes");
-const attendanceRoutes = require("./Routes/AttendanceRoutes");
-const examResultsRoutes = require("./Routes/ExamResultsRoutes");
-const inventoryRoutes = require("./Routes/InventoryRoutes");
-const recentActivityRoutes = require("./Routes/RecentActivityRoutes");
-const staffRoutes = require("./Routes/StaffRoutes");
-const leaveRoutes = require("./Routes/LeaveRoutes");
-const staffAttendanceRoutes = require("./Routes/StaffAttendanceRoutes");
+const app = express()
 
-const app = express();
-
-// Create uploads directories if not exist
-const uploadDir = path.join(__dirname, "uploads");
-const staffUploadsDir = path.join(uploadDir, "staff");
-
+// Create uploads directory if it doesn't exist
+const fs = require("fs")
+const uploadDir = path.join(__dirname, "uploads")
 if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-if (!fs.existsSync(staffUploadsDir)) {
-  fs.mkdirSync(staffUploadsDir, { recursive: true });
+  fs.mkdirSync(uploadDir, { recursive: true })
 }
 
 // Middleware
@@ -34,51 +23,35 @@ app.use(
     origin: "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// Routes
-app.use("/student", studentRoutes);
-app.use("/activity", recentActivityRoutes);
-app.use("/inventory", inventoryRoutes);
-app.use("/exam-results", examResultsRoutes);
-app.use("/attendance", attendanceRoutes);
-
-// Staff-related API routes
-app.use("/api/staff", staffRoutes);
-app.use("/api/leaves", leaveRoutes);
-app.use("/api/staff-attendance", staffAttendanceRoutes);
+  }),
+)
+app.use(express.json())
+app.use("/student", router)
+app.use("/activity", activityRoutes)
+app.use("/inventory", inventoryRoutes)
+app.use("/exam-results", examResultsRoutes)
+app.use("/attendance", attendanceRoutes) // Add this line
+app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 // Test Route
 app.get("/", (req, res) => {
-  res.send("Server is running...");
-});
+  res.send("Server is running...")
+})
 
-// MongoDB connection
-const MONGODB_URI = "mongodb+srv://admin:itp25@mkv.yzfyd75.mongodb.net/SSMS";
-const PORT = 5000;
+// Connect to MongoDB
+const MONGODB_URI = "mongodb+srv://admin:itp25@mkv.5cddqys.mongodb.net/SSMS"
+const PORT = 5000
 
-// Connect to MongoDB with retry logic
-const connectWithRetry = async () => {
-  try {
-    await mongoose.connect(MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("MongoDB Connected Successfully");
+
+mongoose
+  .connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("MongoDB Connected")
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  } catch (err) {
-    console.error("MongoDB connection error:", err);
-    console.log("Retrying connection in 5 seconds...");
-    setTimeout(connectWithRetry, 5000);
-  }
-};
-
-// Start the connection
-connectWithRetry();
+      console.log(`Server running on port ${PORT}`)
+    })
+  })
+  .catch((err) => console.log("MongoDB connection error:", err))

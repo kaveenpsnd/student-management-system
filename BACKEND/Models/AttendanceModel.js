@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose")
+const Schema = mongoose.Schema
 
 const AttendanceRecordSchema = new Schema({
   studentId: {
@@ -16,7 +16,7 @@ const AttendanceRecordSchema = new Schema({
   notes: {
     type: String,
   },
-});
+})
 
 const AttendanceSchema = new Schema({
   class: {
@@ -32,8 +32,9 @@ const AttendanceSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-});
+})
 
-AttendanceSchema.index({ class: 1, date: 1 }, { unique: true });
+// Compound index to ensure uniqueness of class and date combination
+AttendanceSchema.index({ class: 1, date: 1 }, { unique: true })
 
-module.exports = mongoose.model("Attendance", AttendanceSchema);
+module.exports = mongoose.model("Attendance", AttendanceSchema)

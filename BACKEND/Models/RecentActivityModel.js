@@ -1,23 +1,19 @@
-const mongoose = require("mongoose")
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const recentActivitySchema = new mongoose.Schema({
-  type: {
-    type: String,
-    required: true,
-    enum: ["student", "staff", "inventory", "attendance", "leave", "exam", "system"],
-  },
-  description: {
+const RecentActivitySchema = new Schema({
+  studentName: {
     type: String,
     required: true,
   },
-  user: {
+  action: {
     type: String,
-    default: "System",
+    required: true,
   },
   timestamp: {
     type: Date,
     default: Date.now,
   },
-})
+});
 
-module.exports = mongoose.model("RecentActivity", recentActivitySchema)
+module.exports = mongoose.model('RecentActivity', RecentActivitySchema);

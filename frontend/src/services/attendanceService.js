@@ -1,92 +1,61 @@
 import axios from "axios"
 
-const API_URL = "http://localhost:5000/staff-attendance"
+const API_URL = "http://localhost:5000/attendance"
 
-// Mark check-in
-export const markCheckIn = async (staffId, rfidCode) => {
+// Get attendance for a class on a specific date
+export const getClassAttendance = async (classId, date) => {
   try {
-    const response = await axios.post(`${API_URL}/check-in`, {
-      staffId,
-      rfidCode,
+    const response = await axios.get(`${API_URL}/class/${classId}`, {
+      params: { date },
     })
     return response.data
   } catch (error) {
-    console.error("Error marking check-in:", error)
+    console.error(`Error fetching attendance for class ${classId}:`, error)
     throw error
   }
 }
 
-// Mark check-out
-export const markCheckOut = async (staffId, rfidCode) => {
+// Get attendance for a specific student
+export const getStudentAttendance = async (studentId) => {
   try {
-    const response = await axios.post(`${API_URL}/check-out`, {
-      staffId,
-      rfidCode,
-    })
+    const response = await axios.get(`${API_URL}/student/${studentId}`)
     return response.data
   } catch (error) {
-    console.error("Error marking check-out:", error)
+    console.error(`Error fetching attendance for student ${studentId}:`, error)
     throw error
   }
 }
 
-// Get attendance for a specific staff member
-export const getStaffAttendance = async (staffId, filters = {}) => {
+// Save attendance for a class
+export const saveAttendance = async (attendanceData) => {
   try {
-    const response = await axios.get(`${API_URL}/staff/${staffId}`, {
-      params: filters,
-    })
+    const response = await axios.post(API_URL, attendanceData)
     return response.data
   } catch (error) {
-    console.error(`Error fetching attendance for staff ${staffId}:`, error)
+    console.error("Error saving attendance:", error)
     throw error
   }
 }
 
-// Get attendance statistics for a staff member
-export const getStaffAttendanceStats = async (staffId, year) => {
+// Update attendance record
+export const updateAttendance = async (attendanceId, attendanceData) => {
   try {
-    const response = await axios.get(`${API_URL}/stats/${staffId}`, {
-      params: { year },
-    })
+    const response = await axios.put(`${API_URL}/${attendanceId}`, attendanceData)
     return response.data
   } catch (error) {
-    console.error(`Error fetching attendance statistics for staff ${staffId}:`, error)
+    console.error(`Error updating attendance with ID ${attendanceId}:`, error)
     throw error
   }
 }
 
-// Generate attendance report
-export const generateAttendanceReport = async (filters = {}) => {
+// Get attendance statistics for a student
+export const getStudentAttendanceStats = async (studentId) => {
   try {
-    const response = await axios.get(`${API_URL}/report/generate`, {
-      params: filters,
-    })
+    const response = await axios.get(`${API_URL}/stats/${studentId}`)
     return response.data
   } catch (error) {
-    console.error("Error generating attendance report:", error)
+    console.error(`Error fetching attendance stats for student ${studentId}:`, error)
     throw error
   }
 }
 
-// Get top attendance performers
-export const getTopPerformers = async (filters = {}) => {
-  try {
-    const response = await axios.get(`${API_URL}/top-performers`, {
-      params: filters,
-    })
-    return response.data
-  } catch (error) {
-    console.error("Error fetching top performers:", error)
-    throw error
-  }
-}
-
-export const staffAttendanceService = {
-  markCheckIn,
-  markCheckOut,
-  getStaffAttendance,
-  getStaffAttendanceStats,
-  generateAttendanceReport,
-  getTopPerformers,
-}

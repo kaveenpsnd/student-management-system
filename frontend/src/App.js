@@ -1,10 +1,11 @@
-import { Routes, Route, Navigate } from "react-router-dom"
-import { ToastProvider } from "./hooks/use-toast"
+"use client"
+
+import { Routes, Route } from "react-router-dom"
+import { ToastProvider, useToast } from "./hooks/use-toast"
 import ToastContainer from "./Components/ui/ToastContainer"
 
 // Layout components
 import Nav from "./Components/Nav/Nav"
-import "./styles/layout.css"
 
 // Student Management Pages
 import StudentManagement from "./Components/StudentManagement/StudentManagement"
@@ -15,7 +16,6 @@ import ClassAttendance from "./Components/Attendance/ClassAttendance"
 import ExamResults from "./Components/ExamResults/ExamResults"
 import AddExamResult from "./Components/ExamResults/AddExamResult"
 import EditExamResult from "./Components/ExamResults/EditExamResult"
-import UpdateStudent from "./Components/StudentEnrollment/UpdateStudent"
 
 // Inventory Management Pages
 import InventoryDashboard from "./pages/InventoryDashboard"
@@ -24,36 +24,17 @@ import AddItem from "./pages/AddItems"
 import EditItem from "./pages/EditItem"
 import ItemDetails from "./pages/ItemDetails"
 
-// Staff Management Pages
-import StaffLogin from "./Components/StaffManagement/StaffLogin"
-import StaffEnrollment from "./Components/StaffManagement/StaffEnrollment/StaffEnrollment"
-import StaffProfile from "./Components/StaffManagement/StaffProfile/StaffProfile"
-import AdminLeaveManagement from "./Components/StaffManagement/LeaveManagement/AdminLeaveManagement"
-import StaffLeaveManagement from "./Components/StaffManagement/LeaveManagement/StaffLeaveManagement"
-import StaffAttendance from "./Components/StaffManagement/Attendance/StaffAttendance"
-import AdminAttendance from "./Components/StaffManagement/Attendance/AdminAttendance"
-import AdminDashboard from "./Components/StaffManagement/AdminDashboard"
-import StaffDashboard from "./Components/StaffManagement/StaffDashboard"
-import StaffProfiles from "./Components/Staff/StaffProfiles"
-
 // Dashboard
 import Dashboard from "./pages/Dashboard"
 
-// Protected Route component
-const ProtectedRoute = ({ children, allowedRoles }) => {
-  const staffRole = localStorage.getItem('staffRole');
-  const staffToken = localStorage.getItem('staffToken');
+// Add the import for UpdateStudent
+import UpdateStudent from "./Components/StudentEnrollment/UpdateStudent"
 
-  if (!staffToken) {
-    return <Navigate to="/staff/login" replace />;
-  }
-
-  if (allowedRoles && !allowedRoles.includes(staffRole)) {
-    return <Navigate to="/staff/login" replace />;
-  }
-
-  return children;
-};
+// Toast wrapper component to access context
+const ToastWrapper = () => {
+  const { toasts, dismiss } = useToast()
+  return <ToastContainer toasts={toasts} onClose={dismiss} />
+}
 
 function App() {
   return (
@@ -83,67 +64,10 @@ function App() {
               <Route path="/inventory/add" element={<AddItem />} />
               <Route path="/inventory/edit/:id" element={<EditItem />} />
               <Route path="/inventory/:id" element={<ItemDetails />} />
-
-              {/* Staff Management Routes */}
-              <Route path="/staff/login" element={<StaffLogin />} />
-              
-              {/* Protected Admin Routes */}
-              <Route path="/staff/admin" element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/staff" element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <StaffProfiles />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/staff/enrollment" element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <StaffEnrollment />
-                </ProtectedRoute>
-              } />
-              <Route path="/staff/admin/leave" element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminLeaveManagement />
-                </ProtectedRoute>
-              } />
-              <Route path="/staff/admin/attendance" element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminAttendance />
-                </ProtectedRoute>
-              } />
-
-              {/* Protected Staff User Routes */}
-              <Route path="/staff/user" element={
-                <ProtectedRoute allowedRoles={['staff']}>
-                  <StaffDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/staff/user/account" element={
-                <ProtectedRoute allowedRoles={['staff']}>
-                  <StaffProfile />
-                </ProtectedRoute>
-              } />
-              <Route path="/staff/user/leave" element={
-                <ProtectedRoute allowedRoles={['staff']}>
-                  <StaffLeaveManagement />
-                </ProtectedRoute>
-              } />
-              <Route path="/staff/user/attendance" element={
-                <ProtectedRoute allowedRoles={['staff']}>
-                  <StaffAttendance />
-                </ProtectedRoute>
-              } />
-
-              {/* Redirect invalid routes to dashboard */}
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </main>
         </div>
-        <ToastContainer />
+        <ToastWrapper />
       </div>
     </ToastProvider>
   )
