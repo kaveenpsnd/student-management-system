@@ -19,6 +19,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true })
 }
 
+
 // Middleware
 app.use(
   cors({
